@@ -22,22 +22,7 @@ if [[ $install_podman == "y" ]]; then
     to_install+=("cockpit-podman")
 fi
 
-# 询问是否安装Cockpit ZFS管理器
-read -p "是否安装Cockpit ZFS管理器？(y/n): " install_zfs_manager
-if [[ $install_zfs_manager == "y" ]]; then
-    to_install+=("Cockpit ZFS管理器")
-fi
-
 # 根据用户回答安装组件
 for component in "${to_install[@]}"; do
-    if [[ "$component" != "Cockpit ZFS管理器" ]]; then
-        apt install -y -t $(. /etc/os-release && echo $VERSION_CODENAME)-backports "$component"
-    else
-        if [[ $install_zfs_manager == "y" ]]; then
-            apt update
-            apt install -y zfs-dkms zfsutils-linux git
-            git clone https://github.com/optimans/cockpit-zfs-manager.git
-            cp -r cockpit-zfs-manager/zfs /usr/share/cockpit
-        fi
-    fi
+    apt install -y -t $(. /etc/os-release && echo $VERSION_CODENAME)-backports "$component"
 done
