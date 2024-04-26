@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # 安装必备软件
-apt update
 apt install -y sudo curl git vim wget apt-transport-https ca-certificates
 
 # 添加第一个创建的用户至sudo组
