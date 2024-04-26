@@ -20,7 +20,7 @@ done
 read -p "是否安装Cockpit ZFS管理器？(y/n): " install_zfs_manager
 if [[ $install_zfs_manager == "y" ]]; then
     apt update
-    apt install -y zfs-dkms zfsutils-linux
+    apt install -y zfs-dkms zfsutils-linux git
     git clone https://github.com/optimans/cockpit-zfs-manager.git
     cp -r cockpit-zfs-manager/zfs /usr/share/cockpit
 fi
