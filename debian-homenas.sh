@@ -36,7 +36,7 @@ cat << EOF > /etc/apt/sources.list
 deb $mirror $debian_version main contrib non-free
 deb $mirror $debian_version-updates main contrib non-free
 deb $mirror $debian_version-backports main contrib non-free
-deb $mirror $debian_version-security main contrib non-free
+# 使用默认的安全源
 EOF
 
 apt update
