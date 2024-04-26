@@ -4,13 +4,13 @@
 echo "deb http://deb.debian.org/debian $(. /etc/os-release && echo $VERSION_CODENAME)-backports main" > /etc/apt/sources.list.d/backports.list
 apt update
 
+# 安装Cockpit及其附属组件
+apt install -y -t $(. /etc/os-release && echo $VERSION_CODENAME)-backports cockpit cockpit-pcp
+
 # 配置45Drives Repo安装脚本并安装Navigator、File Sharing、Identities组件
 curl -sSL https://repo.45drives.com/setup | bash
 apt update
 apt install -y cockpit-navigator cockpit-file-sharing cockpit-identities
-
-# 安装Cockpit及其附属组件
-apt install -y -t $(. /etc/os-release && echo $VERSION_CODENAME)-backports cockpit cockpit-pcp
 
 # 安装官方组件
 components=("cockpit-machines" "cockpit-podman")
