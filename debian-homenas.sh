@@ -2,7 +2,7 @@
 
 # 安装必备软件
 apt update
-apt install -y sudo curl git vim wget apt-transport-https ca-certificates
+apt install -y sudo curl git vim wget gnupg apt-transport-https ca-certificates
 
 # 添加第一个创建的用户至sudo组
 first_user=$(awk -F: '$3>=1000 && $1 != "nobody" {print $1}' /etc/passwd | sort | head -n 1)
