@@ -2,8 +2,8 @@
 
 # 安装必备软件
 apt update
-apt install -y sudo curl git vim net-tools
-
+apt install -y sudo curl git vim wget
+apt install -y apt-transport-https ca-certificates
 # 添加第一个创建的用户至sudo组
 user_name=$(getent passwd | awk -F: '$3>=1000{print $1}' | head -n 1)
 usermod -aG sudo $user_name
@@ -17,6 +17,5 @@ deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-backports main contrib
 deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware
 EOF
 
-apt update
-apt install -y apt-transport-https ca-certificates
+# 更新系统
 apt update && apt upgrade -y
