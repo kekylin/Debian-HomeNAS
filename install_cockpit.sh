@@ -26,3 +26,30 @@ fi
 for component in "${to_install[@]}"; do
     apt install -y -t $(. /etc/os-release && echo $VERSION_CODENAME)-backports "$component"
 done
+
+# Cockpit调优脚本
+# 自动注销闲置用户设置
+sudo tee -a /etc/cockpit/cockpit.conf > /dev/null <<EOF
+[Session]
+IdleTimeout=15
+Banner=/etc/cockpit/issue.cockpit
+EOF
+sudo systemctl try-restart cockpit
+
+# 在登录页面添加标题
+echo "HomeNAS Based on Debian" | sudo tee /etc/cockpit/issue.cockpit > /dev/null
+sudo systemctl try-restart cockpit
+
+# 配置首页展示信息
+sudo tee /etc/motd > /dev/null <<EOF
+我们信任您已经从系统管理员那里了解了日常注意事项。总结起来无外乎这三点：
+1、尊重别人的隐私。
+2、输入前要先考虑(后果和风险)。
+3、权力越大，责任越大。
+EOF
+
+# 设置Cockpit接管网络配置（网络管理工具由network改为NetworkManager）
+sudo sed -i 's/^/#/' /etc/network/interfaces
+
+# 安装Tuned系统调优工具
+apt install tuned
