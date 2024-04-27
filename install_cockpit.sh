@@ -52,4 +52,4 @@ EOF
 sudo sed -i 's/^/#/' /etc/network/interfaces
 
 # 安装Tuned系统调优工具
-apt install tuned
+apt install tuned -y
