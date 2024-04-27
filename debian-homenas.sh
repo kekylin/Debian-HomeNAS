@@ -70,3 +70,6 @@ EOF
 
 # 设置Cockpit接管网络配置（网络管理工具由network改为NetworkManager）
 sudo sed -i 's/^/#/' /etc/network/interfaces
+
+# 安装Tuned系统调优工具
+apt install tuned
