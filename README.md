@@ -32,8 +32,12 @@
 - 7.1 Docker安装
 - 7.2 容器管理
 
-
-
-
-
-
+# 使用方法
+### 1、使用SSH连接系统，切换root账户
+  ```shell
+su -
+  ```
+### 2、执行脚本下载命令并自动运行
+  ```shell
+wget -O debian-homenas.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/debian-homenas/main/debian-homenas.sh && bash debian-homenas.sh
+  ```
