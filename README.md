@@ -41,3 +41,5 @@ su -
   ```shell
 wget -O debian-homenas.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/debian-homenas/main/debian-homenas.sh && bash debian-homenas.sh
   ```
+### 转载请保留出处
+DIY NAS_1群 874649129		DIY NAS_2群 772356359
