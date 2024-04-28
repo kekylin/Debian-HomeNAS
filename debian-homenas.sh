@@ -5,7 +5,7 @@ wget -O systemsetup.sh -q --show-progress https://mirror.ghproxy.com/https://raw
 wget -O install_cockpit.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/debian-homenas/main/install_cockpit.sh
 wget -O systemsec.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/debian-homenas/main/systemsec.sh
 wget -O dockersetup.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/debian-homenas/main/dockersetup.sh
-wget -O dockersetup.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/servermanager.sh
+wget -O servermanager.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/servermanager.sh
 
 # 确保所有脚本都下载成功
 if [ $? -eq 0 ]; then
