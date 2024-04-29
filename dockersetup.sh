@@ -16,8 +16,23 @@ sudo apt-get update
 # 安装 Docker Engine、containerd 和 Docker Compose
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose
 
-# 创建 Portainer Server 将使用的数据卷
-docker volume create portainer_data
+#部署Docker管理工具Portainer。
+# 检查是否已经部署了同名容器
+check_container_existence() {
+    local container_name="$1"
+    if docker ps -a --format "{{.Names}}" | grep -qFx "$container_name"; then
+        echo "已经存在同名容器 '$container_name'，跳过部署操作。"
+        return 0
+    else
+        return 1
+    fi
+}
 
-# 下载和安装 Portainer Server 容器
-docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
+# 检查是否已经部署了同名容器
+if ! check_container_existence "portainer"; then
+    # 创建 Portainer Server 将使用的数据卷
+    docker volume create portainer_data
+
+    # 下载和安装 Portainer Server 容器
+    docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
+fi
