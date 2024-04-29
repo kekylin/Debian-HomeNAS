@@ -27,18 +27,41 @@ for component in "${to_install[@]}"; do
     apt install -y -t $(. /etc/os-release && echo $VERSION_CODENAME)-backports "$component"
 done
 
+# 检查配置文件中是否已经包含相同的内容
+check_config() {
+    local config_file="$1"
+    local config_content="$2"
+
+    if [ -f "$config_file" ] && grep -qFx "$config_content" "$config_file"; then
+        echo "配置文件 '$config_file' 已经包含相同的配置，跳过操作。"
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Cockpit调优脚本
 # 自动注销闲置用户设置
-sudo tee -a /etc/cockpit/cockpit.conf > /dev/null <<EOF
-[Session]
+setup_cockpit_conf() {
+    local cockpit_conf_file="/etc/cockpit/cockpit.conf"
+    local cockpit_conf_content="[Session]
 IdleTimeout=15
-Banner=/etc/cockpit/issue.cockpit
-EOF
-sudo systemctl try-restart cockpit
+Banner=/etc/cockpit/issue.cockpit"
+
+    if ! check_config "$cockpit_conf_file" "$cockpit_conf_content"; then
+        sudo mkdir -p "$(dirname "$cockpit_conf_file")"
+        echo "" | sudo tee -a "$cockpit_conf_file" > /dev/null
+        echo "$cockpit_conf_content" | sudo tee -a "$cockpit_conf_file" > /dev/null
+        echo "已将配置写入到 '$cockpit_conf_file' 文件中。"
+    fi
+}
+
+# 执行主程序
+setup_cockpit_conf
 
 # 在登录页面添加标题
 echo "HomeNAS Based on Debian" | sudo tee /etc/cockpit/issue.cockpit > /dev/null
-sudo systemctl try-restart cockpit
+
 
 # 配置首页展示信息
 sudo tee /etc/motd > /dev/null <<EOF
@@ -48,10 +71,13 @@ sudo tee /etc/motd > /dev/null <<EOF
 3、权力越大，责任越大。
 EOF
 
+# 安装Tuned系统调优工具
+apt install tuned -y
+
 # 设置Cockpit接管网络配置（网络管理工具由network改为NetworkManager）
 sudo sed -i 's/^/#/' /etc/network/interfaces
 # 重启Network Manager服务
 sudo systemctl restart NetworkManager
 
-# 安装Tuned系统调优工具
-apt install tuned -y
+# 重启cockpit服务
+sudo systemctl try-restart cockpit
