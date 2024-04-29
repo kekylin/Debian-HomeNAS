@@ -16,6 +16,7 @@ if [[ $install_machines == "y" ]]; then
     to_install+=("cockpit-machines")
 fi
 
+# Cockpit调优（自动注销闲置的用户、登录页面中添加标题）
 # 询问是否安装cockpit-podman
 read -p "是否安装cockpit-podman组件？(y/n): " install_podman
 if [[ $install_podman == "y" ]]; then
@@ -61,7 +62,6 @@ setup_cockpit_conf
 
 # 在登录页面添加标题
 echo "HomeNAS Based on Debian" | sudo tee /etc/cockpit/issue.cockpit > /dev/null
-
 
 # 配置首页展示信息
 sudo tee /etc/motd > /dev/null <<EOF
