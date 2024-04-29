@@ -11,13 +11,13 @@ apt install -y -t $(. /etc/os-release && echo $VERSION_CODENAME)-backports cockp
 apt install -y cockpit-navigator cockpit-file-sharing cockpit-identities
 
 # 询问是否安装cockpit-machines
-read -p "是否安装cockpit-machines组件？(y/n): " install_machines
+read -p "是否安装虚拟机组件？(y/n): " install_machines
 if [[ $install_machines == "y" ]]; then
     to_install+=("cockpit-machines")
 fi
 
 # 询问是否安装cockpit-podman
-read -p "是否安装cockpit-podman组件？(y/n): " install_podman
+read -p "是否安装Podman容器组件？(y/n): " install_podman
 if [[ $install_podman == "y" ]]; then
     to_install+=("cockpit-podman")
 fi
