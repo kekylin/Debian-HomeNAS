@@ -3,6 +3,7 @@
 # 下载所有脚本文件
 wget -O systemsetup.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/debian-homenas/main/systemsetup.sh
 wget -O install_cockpit.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/debian-homenas/main/install_cockpit.sh
+wget -O email_config.sh -q --show-progress https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/email_config.sh
 wget -O systemsec.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/debian-homenas/main/systemsec.sh
 wget -O dockersetup.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/debian-homenas/main/dockersetup.sh
 wget -O servermanager.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/servermanager.sh
@@ -14,6 +15,7 @@ if [ $? -eq 0 ]; then
     # 依次执行所有下载的脚本
     bash systemsetup.sh
     bash install_cockpit.sh
+    bash email_config.sh
     bash systemsec.sh
     bash dockersetup.sh
     bash servermanager.sh
