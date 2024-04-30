@@ -2,11 +2,11 @@
 
 # 启用向后移植存储库
 echo "deb http://deb.debian.org/debian $(. /etc/os-release && echo $VERSION_CODENAME)-backports main" > /etc/apt/sources.list.d/backports.list
-# 配置45Drives Repo安装脚本并安装Navigator、File Sharing、Identities组件
+# 配置45Drives Repo安装脚本（用于安装Navigator、File Sharing、Identities组件）
 curl -sSL https://repo.45drives.com/setup | bash
 apt update
 
-# 安装Cockpit及其附属组件
+# 安装Cockpit及其附属组件（Navigator、File Sharing、Identities组件）
 apt install -y -t $(. /etc/os-release && echo $VERSION_CODENAME)-backports cockpit cockpit-pcp
 apt install -y cockpit-navigator cockpit-file-sharing cockpit-identities
 
