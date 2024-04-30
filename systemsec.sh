@@ -54,7 +54,7 @@ EOF
     source "$profile_file"
 }
 
-# 检查并创建登陆邮件通知告警脚本文件
+# 检查并创建登陆系统时邮件告警通知脚本文件
 create_login_notify_script() {
     local notify_script="/etc/pam.d/login-notifiy.sh"
     local notify_content="$(cat <<'EOF'
@@ -117,7 +117,7 @@ set_su_limit() {
 setup_login_notification() {
     local notify_script="/etc/pam.d/login-notifiy.sh"
 
-    read -p "是否需要设置登陆邮件系统通知接收邮箱？(y/n): " answer
+    read -p "是否需要设置登陆系统邮件告警接收邮箱？(y/n): " answer
     if [ "$answer" == "y" ]; then
         read -p "请输入接收邮箱地址: " email
         sudo sed -i '1,$d' "$notify_script" # 清空文件内容
