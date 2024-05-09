@@ -15,13 +15,6 @@ read -p "是否安装虚拟机组件？(y/n): " install_machines
 if [[ $install_machines == "y" ]]; then
     to_install+=("cockpit-machines")
 fi
-
-# 询问是否安装cockpit-podman
-read -p "是否安装Podman容器组件？(y/n): " install_podman
-if [[ $install_podman == "y" ]]; then
-    to_install+=("cockpit-podman")
-fi
-
 # 根据用户回答安装组件
 for component in "${to_install[@]}"; do
     apt install -y -t $(. /etc/os-release && echo $VERSION_CODENAME)-backports "$component"
