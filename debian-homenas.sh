@@ -6,7 +6,7 @@ wget -O install_cockpit.sh -q --show-progress https://mirror.ghproxy.com/https:/
 wget -O email_config.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/email_config.sh
 wget -O systemsec.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/systemsec.sh
 wget -O install_docker.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/install_docker.sh
-wget -O servermanager.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/servermanager.sh
+wget -O service_checker.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/service_checker.sh
 
 # 确保所有脚本都下载成功
 if [ $? -eq 0 ]; then
@@ -18,7 +18,7 @@ if [ $? -eq 0 ]; then
     bash email_config.sh
     bash systemsec.sh
     bash install_docker.sh
-    bash servermanager.sh
+    bash service_checker.sh
 else
     echo "下载脚本失败，请检查网络连接或稍后再试。"
     exit 1
