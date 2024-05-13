@@ -16,6 +16,17 @@ check_and_start_service() {
     echo "$service_status"
 }
 
+# 函数：检查 Docker 容器是否运行
+check_docker_container_running() {
+    local container_name=$1
+    local running_containers=$(docker ps -q -f "name=$container_name" | wc -l)
+    if [ "$running_containers" -gt 0 ]; then
+        echo "active"
+    else
+        echo "inactive"
+    fi
+}
+
 # 函数：输出服务状态信息
 print_service_status() {
     local service_name=$1
@@ -45,10 +56,12 @@ fi
 
 # Portainer 服务
 if [ "$docker_status" == "active" ]; then
-    portainer_running=$(docker ps -q -f "name=portainer" | wc -l)
-    if [ "$portainer_running" -gt 0 ]; then
-        print_service_status "Portainer" "https://$host_ip:9443" "active"
-    else
-        echo -e "${red}Portainer 服务未能正常运行，请检查。${reset}"
-    fi
+    portainer_status=$(check_docker_container_running "portainer")
+    print_service_status "Portainer" "https://$host_ip:9443" "$portainer_status"
+fi
+
+# Dockge 服务
+if [ "$docker_status" == "active" ]; then
+    dockge_status=$(check_docker_container_running "dockge")
+    print_service_status "Dockge" "https://$host_ip:5001" "$dockge_status"
 fi
