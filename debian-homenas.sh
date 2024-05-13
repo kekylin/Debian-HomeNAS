@@ -17,7 +17,7 @@ if [ $? -eq 0 ]; then
     bash install_cockpit.sh
     bash email_config.sh
     bash systemsec.sh
-    bash dockersetup.sh
+    bash install_docker.sh
     bash servermanager.sh
 else
     echo "下载脚本失败，请检查网络连接或稍后再试。"
