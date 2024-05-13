@@ -14,6 +14,8 @@
 ![cockpit](https://github.com/kekylin/Debian-HomeNAS/assets/65521882/7716ac69-ae19-426e-9cf6-b04e141747c4)
 #### Docker服务管理
 ![dockge](https://github.com/kekylin/Debian-HomeNAS/assets/65521882/6ac949d3-f39c-4e37-b8bf-2f42557f909d)
+#### Jellyfin影音服务
+![image](https://github.com/kekylin/Debian-HomeNAS/assets/65521882/c888cde7-30d5-4dc9-9fc1-5f898c8bca32)
 
 # 脚本已实现功能
 ### 一、系统安装  
