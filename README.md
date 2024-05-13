@@ -1,6 +1,4 @@
-<p style="text-align: center;">
-# 基于Debian搭建HomeNAS
-</p>
+<h1 align="center">基于Debian搭建HomeNAS<br />
 这是根据《基于Debian搭建HomeNAS》教程所写的半自动化配置脚本。
 # [搭建HomeNAS系列教程索引](https://docs.qq.com/doc/p/fa51c8a8545b12a5432df0efa9818d2939860ed0)
 ---
