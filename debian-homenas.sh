@@ -4,7 +4,7 @@
 wget -O system_init.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/system_init.sh
 wget -O install_cockpit.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/install_cockpit.sh
 wget -O email_config.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/email_config.sh
-wget -O systemsec.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/systemsec.sh
+wget -O system_security.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/system_security.sh
 wget -O install_docker.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/install_docker.sh
 wget -O service_checker.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/service_checker.sh
 
@@ -16,7 +16,7 @@ if [ $? -eq 0 ]; then
     bash system_init.sh
     bash install_cockpit.sh
     bash email_config.sh
-    bash systemsec.sh
+    bash system_security.sh
     bash install_docker.sh
     bash service_checker.sh
 else
