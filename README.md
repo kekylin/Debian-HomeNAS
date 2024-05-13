@@ -1,11 +1,12 @@
 # 基于Debian搭建HomeNAS
+这是《基于Debian搭建HomeNAS》教程所写的半自动化配置脚本。
+---
 ![最终成果展示](https://github.com/kekylin/Debian-HomeNAS/assets/65521882/680df62e-7f6a-4b10-89a5-56cb363eecc8)
 ![服务器状态监测](https://github.com/kekylin/Debian-HomeNAS/assets/65521882/dbbcf50a-fb51-4672-9e46-16e03fb0a1d2)
 ![服务访问监测](https://github.com/kekylin/Debian-HomeNAS/assets/65521882/9491d322-4859-4e8c-8e59-14964e82f388)
 ![cockpit](https://github.com/kekylin/Debian-HomeNAS/assets/65521882/7716ac69-ae19-426e-9cf6-b04e141747c4)
 ![dockge](https://github.com/kekylin/Debian-HomeNAS/assets/65521882/6ac949d3-f39c-4e37-b8bf-2f42557f909d)
 
-这是《基于Debian搭建HomeNAS》教程所写的半自动化配置脚本，目前脚本已经实现教程中以下章节操作。
 # [搭建HomeNAS系列教程索引](https://docs.qq.com/doc/p/fa51c8a8545b12a5432df0efa9818d2939860ed0)
 ---
 # 脚本已实现功能
