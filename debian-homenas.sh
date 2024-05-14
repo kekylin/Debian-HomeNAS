@@ -9,7 +9,7 @@ wget -O debian-homenas/install_cockpit.sh -q --show-progress https://mirror.ghpr
 wget -O debian-homenas/email_config.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/email_config.sh
 wget -O debian-homenas/system_security.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/system_security.sh
 wget -O debian-homenas/install_docker.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/install_docker.sh
-wget -O debian-homenas/install_fail2ban.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/install_fail2ban.sh
+# wget -O debian-homenas/install_fail2ban.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/install_fail2ban.sh
 wget -O debian-homenas/service_checker.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/service_checker.sh
 
 # 确保所有脚本都下载成功
@@ -22,7 +22,7 @@ if [ $? -eq 0 ]; then
     bash debian-homenas/email_config.sh
     bash debian-homenas/system_security.sh
     bash debian-homenas/install_docker.sh
-    bash debian-homenas/install_fail2ban.sh
+#     bash debian-homenas/install_fail2ban.sh
     bash debian-homenas/service_checker.sh
 else
     echo "下载脚本失败，请检查网络连接或稍后再试。"
