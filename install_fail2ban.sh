@@ -12,7 +12,12 @@ if [[ $install_fail2ban == "y" ]]; then
     dest_email="${dest_email:-root@localhost}"
 
     # 提取发送者邮箱地址
-    sender_email=$(awk '/root:/ {print $2}' /etc/email-addresses)
+    sender_email=$(grep "^root:" /etc/email-addresses | cut -d ':' -f 2 | sed 's/ //g')
+
+    # 如果在/etc/email-addresses文件中找不到root:内容，则使用默认值root@<fq-hostname>
+    if [[ -z "$sender_email" ]]; then
+        sender_email="root@<fq-hostname>"
+    fi
 
     # 替换配置文件中的邮箱地址
     sudo sed -i "s/destemail = .*/destemail = $dest_email/g" /etc/fail2ban/jail.local
