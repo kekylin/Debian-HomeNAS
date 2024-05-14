@@ -63,5 +63,5 @@ fi
 # Dockge 服务
 if [ "$docker_status" == "active" ]; then
     dockge_status=$(check_docker_container_running "dockge")
-    print_service_status "Dockge" "https://$host_ip:5001" "$dockge_status"
+    print_service_status "Dockge" "http://$host_ip:5001" "$dockge_status"
 fi
