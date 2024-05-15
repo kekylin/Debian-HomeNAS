@@ -90,7 +90,7 @@ EOT
     fi
 
     # 输出提取通知发送邮箱地址
-    echo "通知发送邮箱地址为: $sender_email"
+    echo "Fail2ban通知发送邮箱地址为: $sender_email"
 
     # 替换配置文件中的邮箱地址
     sudo sed -i "s/destemail = .*/destemail = $dest_email/g" /etc/fail2ban/jail.local
