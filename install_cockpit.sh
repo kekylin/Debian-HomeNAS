@@ -35,6 +35,17 @@ apt install tuned -y
 # 检查/etc/cockpit/cockpit.conf配置文件是否存在，不存在则创建
 if [ ! -f "/etc/cockpit/cockpit.conf" ]; then
     touch /etc/cockpit/cockpit.conf
+
+    # 插入初始配置内容
+    echo "[Session]" > /etc/cockpit/cockpit.conf
+    echo "IdleTimeout=15" >> /etc/cockpit/cockpit.conf
+    echo "Banner=/etc/cockpit/issue.cockpit" >> /etc/cockpit/cockpit.conf
+
+    echo -e "\n[WebService]" >> /etc/cockpit/cockpit.conf
+    echo "ProtocolHeader = X-Forwarded-Proto" >> /etc/cockpit/cockpit.conf
+    echo "ForwardedForHeader = X-Forwarded-For" >> /etc/cockpit/cockpit.conf
+    echo "LoginTo = false" >> /etc/cockpit/cockpit.conf
+    echo "LoginTitle = HomeNAS" >> /etc/cockpit/cockpit.conf
 fi
 
 # 检查/etc/cockpit/issue.cockpit配置文件是否存在，不存在则创建
@@ -43,7 +54,7 @@ if [ ! -f "/etc/cockpit/issue.cockpit" ]; then
 fi
 
 # 检查是否需要设置Cockpit外网访问
-read -p "是否需要设置Cockpit外网访问？(y/n): " response
+read -p "是否设置Cockpit外网访问？(y/n): " response
 if [ "$response" == "y" ]; then
     # 提示用户输入外网访问域名和端口号
     read -p "请输入Cockpit外网访问域名和端口号： " domain
@@ -54,41 +65,12 @@ if [ "$response" == "y" ]; then
     # 检查/etc/cockpit/cockpit.conf配置文件是否存在，并进行配置
     if [ -f "/etc/cockpit/cockpit.conf" ]; then
         if ! grep -q "Origins" /etc/cockpit/cockpit.conf; then
-            echo "Origins = https://$domain wss://$domain https://$internal_ip:9090" >> /etc/cockpit/cockpit.conf
+            sed -i "/\[WebService\]/a Origins = https://$domain wss://$domain https://$internal_ip:9090" /etc/cockpit/cockpit.conf
         else
             sed -i "s#\(Origins = .*\)#Origins = https://$domain wss://$domain https://$internal_ip:9090#" /etc/cockpit/cockpit.conf
         fi
-    else
-        # 创建/etc/cockpit/cockpit.conf并进行配置
-        echo "[WebService]" > /etc/cockpit/cockpit.conf
-        echo "Origins = https://$domain wss://$domain https://$internal_ip:9090" >> /etc/cockpit/cockpit.conf
     fi
 fi
-
-# 检查/etc/cockpit/cockpit.conf是否存在，并进行配置
-if [ -f "/etc/cockpit/cockpit.conf" ]; then
-    if ! grep -q "\[Session\]" /etc/cockpit/cockpit.conf; then
-        echo -e "\n[Session]" >> /etc/cockpit/cockpit.conf
-        echo "IdleTimeout=15" >> /etc/cockpit/cockpit.conf
-        echo "Banner=/etc/cockpit/issue.cockpit" >> /etc/cockpit/cockpit.conf
-    fi
-    if ! grep -q "\[WebService\]" /etc/cockpit/cockpit.conf; then
-        echo -e "\n[WebService]" >> /etc/cockpit/cockpit.conf
-        echo "ProtocolHeader = X-Forwarded-Proto" >> /etc/cockpit/cockpit.conf
-        echo "ForwardedForHeader = X-Forwarded-For" >> /etc/cockpit/cockpit.conf
-        echo "LoginTo = false" >> /etc/cockpit/cockpit.conf
-        echo "LoginTitle = HomeNAS" >> /etc/cockpit/cockpit.conf
-    fi
-else
-    # 创建/etc/cockpit/cockpit.conf并进行配置
-    echo -e "[Session]\nIdleTimeout=15\nBanner=/etc/cockpit/issue.cockpit" > /etc/cockpit/cockpit.conf
-    echo -e "\n[WebService]" >> /etc/cockpit/cockpit.conf
-    echo "ProtocolHeader = X-Forwarded-Proto" >> /etc/cockpit/cockpit.conf
-    echo "ForwardedForHeader = X-Forwarded-For" >> /etc/cockpit/cockpit.conf
-    echo "LoginTo = false" >> /etc/cockpit/cockpit.conf
-    echo "LoginTitle = HomeNAS" >> /etc/cockpit/cockpit.conf
-fi
-
 echo "Cockpit调优配置完成。"
 
 # 设置Cockpit接管网络配置（网络管理工具由network改为NetworkManager）
@@ -102,12 +84,10 @@ setup_network_configuration() {
         echo "文件 '$interfaces_file' 不存在，跳过操作。"
     fi
 }
-
 # 重启Network Manager服务
 restart_network_manager() {
     systemctl restart NetworkManager && echo "已重启 Network Manager 服务。"
 }
-
 # 执行主程序
 setup_network_configuration
 restart_network_manager
