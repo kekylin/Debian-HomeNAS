@@ -8,7 +8,7 @@ if [[ $install_fail2ban == "y" ]]; then
     sudo apt install fail2ban -y
 
     # 获取用户输入的邮件地址，如果未输入，则使用默认值
-    read -p "请输入接收告警通知邮箱账户: " dest_email
+    read -p "请输入接收Fail2ban告警通知邮箱账户: " dest_email
     dest_email="${dest_email:-root@localhost}"
 
     # 提取发送者邮箱地址
