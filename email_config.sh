@@ -40,8 +40,8 @@ dc_localdelivery='mail_spool'
 EOF
 
 # 询问用户输入QQ邮件账户及授权密码
-read -p "请输入QQ邮件账户: " qq_account
-read -sp "请输入QQ邮件授权密码: " qq_password
+read -p "请输入QQ邮箱账户: " qq_account
+read -sp "请输入QQ邮箱授权密码: " qq_password
 echo
 
 # 编辑/etc/exim4/passwd.client文件配置邮件发送账户
