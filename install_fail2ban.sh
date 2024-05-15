@@ -176,5 +176,5 @@ EOT
 elif [[ $install_fail2ban == "n" ]]; then
     echo "已跳过Fail2ban安装和配置。"
 else
-    echo "未做出选择，跳过Fail2ban安装和配置。"
+    echo "已跳过Fail2ban安装和配置。"
 fi
