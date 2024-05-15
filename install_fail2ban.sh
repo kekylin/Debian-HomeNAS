@@ -62,82 +62,19 @@ EOT
     # 复制并配置mail-whois.local
     sudo cp /etc/fail2ban/action.d/mail-whois.{conf,local}
     cat <<EOT | sudo tee /etc/fail2ban/action.d/mail-whois.local >/dev/null
-# Fail2Ban configuration file
-#
-# Author: Cyril Jaquier
-#
-#
-
 [INCLUDES]
-
 before = mail-whois-common.conf
 
 [Definition]
-
-# bypass ban/unban for restored tickets
 norestored = 1
-
-# Option:  actionstart
-# Notes.:  command executed on demand at the first ban (or at the start of Fail2Ban if actionstart_on_demand is set to false).
-# Values:  CMD
-#
-actionstart = printf %%b "你好！\n
-              监视到【<name>】服务已成功启动。\n
-              敬请注意！\n
-              Fail2Ban"|mail -s "[Fail2Ban] <name>: 在 <fq-hostname> 服务器上启动" <dest>
-
-# Option:  actionstop
-# Notes.:  command executed at the stop of jail (or at the end of Fail2Ban)
-# Values:  CMD
-#
-actionstop = printf %%b "你好！\n
-             监视到【<name>】服务已被停止。\n
-             敬请注意！\n
-             Fail2Ban"|mail -s "[Fail2Ban] <name>: 在 <fq-hostname> 服务器上停止" <dest>
-
-# Option:  actioncheck
-# Notes.:  command executed once before each actionban command
-# Values:  CMD
-#
-actioncheck = 
-
-# Option:  actionban
-# Notes.:  command executed when banning an IP. Take care that the
-#          command is executed with Fail2Ban user rights.
-# Tags:    See jail.conf(5) man page
-# Values:  CMD
-#
-actionban = printf %%b "警告!!!\n
-            攻击者IP：<ip>\n
-            被攻击机器名：`uname -n` \n
-            被攻击机器IP：`/bin/curl ifconfig.co` \n
-            攻击服务：<name> \n
-            攻击次数：<failures> 次 \n
-            攻击方法：暴力破解，尝试弱口令.\n
-            该IP：<ip>已经被Fail2Ban加入防火墙黑名单,屏蔽时间<bantime>秒.\n\n
-            以下是攻击者 <ip>信息 :\n
-            `/bin/curl https://ip.appworlds.cn?ip=<ip>`\n\n
-            Fail2Ban邮件提醒\n\n "|/bin/mailx -s "<fq-hostname>服务器:<name>服务疑似遭到<ip>暴力攻击。" <dest>
-
-
-# Option:  actionunban
-# Notes.:  command executed when unbanning an IP. Take care that the
-#          command is executed with Fail2Ban user rights.
-# Tags:    See jail.conf(5) man page
-# Values:  CMD
-#
-actionunban = 
-
+actionstart = printf %%b "你好！\n监视到【<name>】服务已成功启动。\n敬请注意！\nFail2Ban"|mail -s "[Fail2Ban] <name>: 在 <fq-hostname> 服务器上启动" <dest>
+actionstop = printf %%b "你好！\n监视到【<name>】服务已被停止。\n敬请注意！\nFail2Ban"|mail -s "[Fail2Ban] <name>: 在 <fq-hostname> 服务器上停止" <dest>
+actioncheck =
+actionban = printf %%b "警告!!!\n攻击者IP：<ip>\n被攻击机器名：$(uname -n) \n被攻击机器IP：$(/bin/curl ifconfig.co) \n攻击服务：<name> \n攻击次数：<failures> 次 \n攻击方法：暴力破解，尝试弱口令.\n该IP：<ip>已经被Fail2Ban加入防火墙黑名单,屏蔽时间<bantime>秒.\n\n以下是攻击者 <ip>信息 :\n$(/bin/curl https://ip.appworlds.cn?ip=\$ip)\n\nFail2Ban邮件提醒\n\n "|/bin/mailx -s "<fq-hostname>服务器:<name>服务疑似遭到<ip>暴力攻击。" <dest>
+actionunban =
 [Init]
-
-# Default name of the chain
-#
 name = default
-
-# Destination/Addressee of the mail
-#
 dest = root
-
 EOT
 
     # 获取用户输入的邮件地址，如果未输入，则使用默认值
@@ -171,7 +108,7 @@ EOT
     # 启动Fail2ban
     sudo systemctl start fail2ban
 
-    echo "Fail2ban 安装和配置完成！"
+    echo "Fail2ban安装和配置完成！"
 
 elif [[ $install_fail2ban == "n" ]]; then
     echo "已跳过Fail2ban安装和配置。"
