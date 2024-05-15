@@ -57,7 +57,7 @@ sudo service exim4 restart
 
 # 检测exim4服务是否正常运行
 if sudo service exim4 status | grep -q "active (running)"; then
-    echo -e "\e[32m邮件发送服务已完成。\e[0m"
+    echo -e "\e[32m邮件发送服务已配置完成。\e[0m"
 else
     echo -e "\e[31m邮件发送服务运行异常，请检查服务状态。\e[0m"
 fi
