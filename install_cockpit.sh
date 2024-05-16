@@ -73,7 +73,7 @@ else
     read -p "请输入Cockpit外网访问域名和端口号： " input_domain
 
     # 从输入的域名中提取纯域名和端口号
-    domain=$(echo "$input_domain" | sed 's#^https\?://##;s#.*://##;s#:[0-9]*$##')
+    domain=$(echo "$input_domain" | sed 's#^https\?://##;s#^http\?://##;s#.*://##;s#:[0-9]*$##')
     # 如果用户没有输入端口号，默认使用9090
     if ! echo "$domain" | grep -q ":"; then
         domain="$domain:9090"
