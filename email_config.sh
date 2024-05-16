@@ -10,7 +10,7 @@ if [ "$choice" != "y" ]; then
 fi
 
 # 安装邮件发送服务exim4
-sudo apt install exim4 -y
+apt update && apt install -y exim4
 
 # 备份配置文件
 sudo cp /etc/exim4/update-exim4.conf.conf /etc/exim4/update-exim4.conf.conf.backup
