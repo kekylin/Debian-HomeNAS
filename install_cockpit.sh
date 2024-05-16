@@ -55,7 +55,20 @@ fi
 
 # 检查是否需要设置Cockpit外网访问
 read -p "是否设置Cockpit外网访问？(y/n): " response
-if [ "$response" == "y" ]; then
+if [ -z "$response" ] || [ "$response" == "n" ]; then
+    # 如果用户不做回应或者回答n，则检查/etc/cockpit/cockpit.conf配置文件是否已经配置了Origins参数
+    if [ -f "/etc/cockpit/cockpit.conf" ]; then
+        if grep -q "Origins" /etc/cockpit/cockpit.conf; then
+            # 如果配置文件中存在Origins参数，则将此行Origins参数删除掉
+            sed -i '/Origins/d' /etc/cockpit/cockpit.conf
+            echo "已跳过Cockpit外网访问配置，并删除对应外网访问参数。"
+        else
+            echo "已跳过Cockpit外网访问配置，且检查没有配置外网访问参数。"
+        fi
+    else
+        echo "已跳过Cockpit外网访问配置。"
+    fi
+else
     # 提示用户输入外网访问域名和端口号
     read -p "请输入Cockpit外网访问域名和端口号： " input_domain
 
