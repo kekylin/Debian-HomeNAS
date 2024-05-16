@@ -9,9 +9,6 @@ if [ "$choice" != "y" ]; then
     exit 0
 fi
 
-# 安装邮件发送服务exim4
-apt update && apt install -y exim4
-
 # 备份配置文件
 sudo cp /etc/exim4/update-exim4.conf.conf /etc/exim4/update-exim4.conf.conf.backup
 sudo cp /etc/exim4/passwd.client /etc/exim4/passwd.client.backup
