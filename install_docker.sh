@@ -16,6 +16,10 @@ sudo apt-get update
 # 安装 Docker Engine、containerd 和 Docker Compose
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose
 
+# 添加第一个创建的用户（ID：1000）至docker组
+first_user=$(awk -F: '$3>=1000 && $1 != "nobody" {print $1}' /etc/passwd | sort | head -n 1)
+usermod -aG docker "$first_user"
+
 # 检查是否已经部署了同名容器
 check_container_existence() {
     local container_name="$1"
