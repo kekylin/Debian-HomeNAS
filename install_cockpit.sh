@@ -53,14 +53,18 @@ if [ ! -f "/etc/cockpit/issue.cockpit" ]; then
     echo "基于Debian搭建HomeNAS！" > /etc/cockpit/issue.cockpit
 fi
 
+#!/bin/bash
+
 # 检查是否需要设置Cockpit外网访问
 read -p "是否设置Cockpit外网访问？(y/n): " response
-if [ -z "$response" ] || [ "$response" == "n" ]; then
-    # 如果用户不做回应或者回答n，则检查/etc/cockpit/cockpit.conf配置文件是否已经配置了Origins参数
-    if [ -f "/etc/cockpit/cockpit.conf" ]; then
-        if grep -q "Origins" /etc/cockpit/cockpit.conf; then
-            # 如果配置文件中存在Origins参数，则将此行Origins参数删除掉
-            sed -i '/Origins/d' /etc/cockpit/cockpit.conf
+config_file="/etc/cockpit/cockpit.conf"
+
+if [[ -z "$response" || "$response" == "n" ]]; then
+    # 用户不做回应或者回答n
+    if [[ -f "$config_file" ]]; then
+        if grep -q "Origins" "$config_file"; then
+            # 删除Origins参数行
+            sed -i '/Origins/d' "$config_file"
             echo "已跳过Cockpit外网访问配置，并删除对应外网访问参数。"
         else
             echo "已跳过Cockpit外网访问配置，且检查没有配置外网访问参数。"
@@ -70,26 +74,26 @@ if [ -z "$response" ] || [ "$response" == "n" ]; then
     fi
 else
     # 提示用户输入外网访问域名和端口号
-    read -p "请输入Cockpit外网访问域名和端口号： " input_domain
+    read -p "请输入Cockpit外网访问域名和端口号（例如 example.com:9090）： " input_domain
 
-    # 从输入的域名中提取纯域名和端口号
-    domain=$(echo "$input_domain" | sed 's#^https\?://##;s#^http\?://##;s#.*://##;s#:[0-9]*$##')
-    # 如果用户没有输入端口号，默认使用9090
-    if ! echo "$domain" | grep -q ":"; then
-        domain="$domain:9090"
-    fi
+    # 默认端口号为9090
+    [[ "$input_domain" != *:* ]] && input_domain="$input_domain:9090"
+
+    # 提取域名和端口号
+    domain=$(echo "$input_domain" | sed 's#^[^:]*://##')
 
     # 提取当前主机内网IP地址
-    internal_ip=$(hostname -I | cut -d' ' -f1)
+    internal_ip=$(hostname -I | awk '{print $1}')
 
-    # 检查/etc/cockpit/cockpit.conf配置文件是否存在，并进行配置
-    if [ -f "/etc/cockpit/cockpit.conf" ]; then
-        if ! grep -q "Origins" /etc/cockpit/cockpit.conf; then
-            sed -i "/\[WebService\]/a Origins = https://$domain wss://$domain https://$internal_ip:9090" /etc/cockpit/cockpit.conf
+    # 配置Cockpit的Origins参数
+    if [[ -f "$config_file" ]]; then
+        if grep -q "Origins" "$config_file"; then
+            sed -i "s#^Origins = .*#Origins = https://$domain wss://$domain https://$internal_ip:9090#" "$config_file"
         else
-            sed -i "s#\(Origins = .*\)#Origins = https://$domain wss://$domain https://$internal_ip:9090#" /etc/cockpit/cockpit.conf
+            sed -i "/\[WebService\]/a Origins = https://$domain wss://$domain https://$internal_ip:9090" "$config_file"
         fi
     fi
+    echo "已配置Cockpit外网访问参数。"
 fi
 echo "Cockpit调优配置完成。"
 
