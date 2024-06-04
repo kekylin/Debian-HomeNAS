@@ -37,7 +37,7 @@ print_service_status() {
         echo -e "${green}$service_name 服务已运行！${reset}"
         echo -e "请通过浏览器访问 $service_url"
     else
-        echo -e "${red}$service_name 服务未能正常运行，请检查。${reset}"
+        echo -e "${red}$service_name 服务未安装或未正常运行，请检查。${reset}"
     fi
 }
 
@@ -51,7 +51,7 @@ print_service_status "Cockpit Web" "https://$host_ip:9090" "$cockpit_status"
 # Docker 服务
 docker_status=$(systemctl is-active docker.service 2>/dev/null)
 if [ "$docker_status" != "active" ]; then
-    echo -e "${red}Docker 服务未能正常运行，请检查。${reset}"
+    echo -e "${red}Docker 服务未安装或未正常运行，请检查。${reset}"
 fi
 
 # Portainer 服务
