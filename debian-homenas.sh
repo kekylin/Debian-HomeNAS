@@ -24,7 +24,7 @@ aliases=(
     "安装自动封锁服务"
     "服务检查及信息提示"
 )
-url_prefix="https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/"
+url_prefix="https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/main/Shell/"
 
 # 下载所有脚本文件到 debian-homenas 文件夹
 for i in "${!files[@]}"; do
