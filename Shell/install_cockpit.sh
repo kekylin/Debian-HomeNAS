@@ -73,14 +73,11 @@ if [[ -z "$response" || "$response" == "n" ]]; then
         echo "已跳过Cockpit外网访问配置。"
     fi
 else
-    # 提示用户输入外网访问域名和端口号
-    read -p "请输入Cockpit外网访问域名和端口号（例如 example.com:9090）： " input_domain
+    # 提示用户输入外网访问域名
+    read -p "请输入Cockpit外网访问域名（例如 example.com）： " domain
 
-    # 默认端口号为9090
-    [[ "$input_domain" != *:* ]] && input_domain="$input_domain:9090"
-
-    # 提取域名和端口号
-    domain=$(echo "$input_domain" | sed 's#^[^:]*://##')
+    # 移除输入中的协议部分
+    domain=$(echo "$domain" | sed -E 's#^https?://##')
 
     # 提取当前主机内网IP地址
     internal_ip=$(hostname -I | awk '{print $1}')
@@ -92,9 +89,13 @@ else
         else
             sed -i "/\[WebService\]/a Origins = https://$domain wss://$domain https://$internal_ip:9090" "$config_file"
         fi
+    else
+        echo "[WebService]" > "$config_file"
+        echo "Origins = https://$domain wss://$domain https://$internal_ip:9090" >> "$config_file"
     fi
-    echo "已配置Cockpit外网访问参数。"
+    echo "已设置Cockpit外网访问域名：https://$domain"
 fi
+
 echo "Cockpit调优配置完成。"
 
 # 设置Cockpit接管网络配置（网络管理工具由network改为NetworkManager）
