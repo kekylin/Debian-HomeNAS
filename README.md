@@ -85,9 +85,14 @@
   ```shell
 su -
   ```
-### 2、执行脚本下载命令并自动运行
+### 2、执行脚本下载命令并自动运行（二选一）
+国内用户
   ```shell
-wget -O debian-homenas.sh -q --show-progress https://mirror.ghproxy.com/https://raw.githubusercontent.com/kekylin/debian-homenas/main/debian-homenas.sh && bash debian-homenas.sh
+wget -O debian-homenas.sh -q --show-progress https://gitee.com/kekylin/Debian-HomeNAS/raw/main/debian-homenas_cn.sh && bash debian-homenas.sh
+  ```
+Github直连
+  ```shell
+wget -O debian-homenas.sh -q --show-progress https://raw.githubusercontent.com/kekylin/debian-homenas/main/debian-homenas.sh && bash debian-homenas.sh
   ```
 ### 2、登陆使用
 > **脚本执行完毕后，查看SSH工具显示的Cockpit面板管理地址和Docker管理工具地址，打开对应服务进行使用。**
