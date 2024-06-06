@@ -29,7 +29,7 @@
 ### 三、安装Cockpit Web管理面板  
 3.1 安装Cockpit （已实现）  
 3.2 安装Cockpit附属组件 （已实现）  
-3.3 Cockpit调优  
+3.3 Cockpit调优  （已实现）  
 ### 四、系统调优  
 4.1 设置Cockpit接管网络配置 （已实现）  
 4.2 调整系统时区/时间  
