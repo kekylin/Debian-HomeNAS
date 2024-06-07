@@ -53,47 +53,52 @@ if [ ! -f "/etc/cockpit/issue.cockpit" ]; then
     echo "基于Debian搭建HomeNAS！" > /etc/cockpit/issue.cockpit
 fi
 
-#!/bin/bash
-
 # 检查是否需要设置Cockpit外网访问
 read -p "是否设置Cockpit外网访问？(y/n): " response
 config_file="/etc/cockpit/cockpit.conf"
 
-if [[ -z "$response" || "$response" == "n" ]]; then
-    # 用户不做回应或者回答n
-    if [[ -f "$config_file" ]]; then
-        if grep -q "Origins" "$config_file"; then
-            # 删除Origins参数行
-            sed -i '/Origins/d' "$config_file"
-            echo "已跳过Cockpit外网访问配置，并删除对应外网访问参数。"
-        else
-            echo "已跳过Cockpit外网访问配置，且检查没有配置外网访问参数。"
-        fi
-    else
-        echo "已跳过Cockpit外网访问配置。"
-    fi
-else
-    # 提示用户输入外网访问域名
-    read -p "请输入Cockpit外网访问域名（例如 example.com）： " domain
+# Function to delete configuration parameters
+delete_params() {
+    sed -i '/Origins/d' "$config_file"
+    sed -i '/Access-Control-Allow-Origin/d' "$config_file"
+    echo "已删除Cockpit外网访问相关配置。"
+}
 
-    # 移除输入中的协议部分
-    domain=$(echo "$domain" | sed -E 's#^https?://##')
-
-    # 提取当前主机内网IP地址
+# Function to set configuration parameters
+set_params() {
+    # 提取当前主机的内网IP地址段
     internal_ip=$(hostname -I | awk '{print $1}')
+    internal_subnet=$(echo "$internal_ip" | sed -E 's/\.[0-9]+$/\.0\/24/')
 
-    # 配置Cockpit的Origins参数
-    if [[ -f "$config_file" ]]; then
-        if grep -q "Origins" "$config_file"; then
-            sed -i "s#^Origins = .*#Origins = https://$domain wss://$domain https://$internal_ip:9090#" "$config_file"
-        else
-            sed -i "/\[WebService\]/a Origins = https://$domain wss://$domain https://$internal_ip:9090" "$config_file"
-        fi
+    # 配置Cockpit的Origins和Access-Control-Allow-Origin参数
+    if grep -q "Origins" "$config_file"; then
+        sed -i "s#^Origins = .*#Origins = https://$domain wss://$domain#" "$config_file"
     else
-        echo "[WebService]" > "$config_file"
-        echo "Origins = https://$domain wss://$domain https://$internal_ip:9090" >> "$config_file"
+        sed -i "/\[WebService\]/a Origins = https://$domain wss://$domain" "$config_file"
+    fi
+
+    if grep -q "Access-Control-Allow-Origin" "$config_file"; then
+        sed -i "s#^Access-Control-Allow-Origin: .*#Access-Control-Allow-Origin: https://$internal_subnet#" "$config_file"
+    else
+        sed -i "/Origins = /a Access-Control-Allow-Origin: https://$internal_subnet" "$config_file"
     fi
     echo "已设置Cockpit外网访问域名：https://$domain"
+    echo "已设置内网访问地址段：https://$internal_subnet"
+}
+
+# 判断用户是否选择设置Cockpit外网访问
+if [[ -z "$response" || "$response" == "n" ]]; then
+    # 用户不做回应或者回答n，删除配置参数
+    [[ -f "$config_file" ]] && delete_params
+    echo "已跳过Cockpit外网访问配置。"
+else
+    # 提示用户输入外网访问域名
+    read -p "请输入Cockpit外网访问域名和端口号（例如 example.com:9090）： " domain
+    # 移除输入中的协议部分
+    domain=$(echo "$domain" | sed -E 's#^https?://##')
+    # 设置配置参数
+    [[ ! -f "$config_file" ]] && echo "[WebService]" > "$config_file"
+    set_params
 fi
 
 echo "Cockpit调优配置完成。"
