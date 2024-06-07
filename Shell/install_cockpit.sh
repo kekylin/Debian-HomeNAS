@@ -12,13 +12,29 @@ apt install -y cockpit-navigator cockpit-file-sharing cockpit-identities
 
 # 询问是否安装cockpit-machines
 read -p "是否安装虚拟机组件？(y/n): " install_machines
+
 if [[ $install_machines == "y" ]]; then
-    to_install+=("cockpit-machines")
+    # 安装 cockpit-machines 组件
+    apt install -y -t $(. /etc/os-release && echo $VERSION_CODENAME)-backports cockpit-machines
+
+    # 开启IP包转发功能
+    echo "开启IP包转发功能..."
+
+    # 编辑 /etc/sysctl.conf 文件
+    sysctl_conf="/etc/sysctl.conf"
+    if grep -qE "^#?net.ipv4.ip_forward=1" "$sysctl_conf"; then
+        sed -i 's/^#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' "$sysctl_conf"
+    else
+        echo "net.ipv4.ip_forward=1" >> "$sysctl_conf"
+    fi
+
+    # 应用更改
+    sysctl -p
+
+    echo "已安装虚拟机组件。"
+else
+    echo "已跳过虚拟机组件安装。"
 fi
-# 根据用户回答安装组件
-for component in "${to_install[@]}"; do
-    apt install -y -t $(. /etc/os-release && echo $VERSION_CODENAME)-backports "$component"
-done
 
 # 配置首页展示信息
 tee /etc/motd > /dev/null <<EOF
