@@ -1,20 +1,15 @@
 #!/bin/bash
 
-# 设置 Docker 的apt存储库
-sudo apt-get update
-sudo apt-get install -y ca-certificates curl
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
-
-# 安装 Docker Engine、containerd 和 Docker Compose
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose
+# 使用华为镜像源安装Docker
+# 安装依赖
+apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common
+# 运行公钥
+curl -fsSL https://mirrors.huaweicloud.com/docker-ce/linux/debian/gpg | apt-key add -
+# 添加软件仓库
+add-apt-repository "deb [arch=amd64] https://mirrors.huaweicloud.com/docker-ce/linux/debian $(lsb_release -cs) stable"
+# 更新索引文件并安装 Docker 相关组件
+apt-get update
+apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # 添加第一个创建的用户（ID：1000）至docker组
 first_user=$(awk -F: '$3>=1000 && $1 != "nobody" {print $1}' /etc/passwd | sort | head -n 1)
