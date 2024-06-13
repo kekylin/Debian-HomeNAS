@@ -2,7 +2,7 @@
 
 # 启用向后移植存储库
 os_codename=$(awk -F= '/VERSION_CODENAME/{print $2}' /etc/os-release)
-echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian $os_codename-backports main" > /etc/apt/sources.list.d/backports.list
+echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware" > /etc/apt/sources.list.d/backports.list
 
 # 配置45Drives Repo安装脚本（用于安装Navigator、File Sharing、Identities组件）
 curl -sSL https://repo.45drives.com/setup | bash
