@@ -8,7 +8,8 @@ apt update
 os_codename=$(awk -F= '/VERSION_CODENAME/{print $2}' /etc/os-release)
 
 # 安装Cockpit及其附属组件（Navigator、File Sharing、Identities组件）
-apt install -y -t "$os_codename-backports" cockpit cockpit-pcp cockpit-navigator cockpit-file-sharing cockpit-identities
+apt install -y -t "$os_codename-backports" cockpit cockpit-pcp
+apt install -y cockpit-navigator cockpit-file-sharing cockpit-identities
 
 # 询问是否安装cockpit-machines
 read -p "是否安装虚拟机组件？(y/n): " install_machines
