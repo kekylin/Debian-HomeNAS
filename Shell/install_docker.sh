@@ -5,10 +5,10 @@
 apt-get install ca-certificates curl gnupg
 # 信任 Docker 的 GPG 公钥并添加仓库
 install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://gitee.com/kekylin/docker-ce/raw/master/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-sudo chmod a+r /etc/apt/keyrings/docker.gpg
+curl -fsSL https://mirrors.huaweicloud.com/docker-ce/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+chmod a+r /etc/apt/keyrings/docker.gpg
 echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/debian \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://mirrors.huaweicloud.com/docker-ce/linux/debian \
   "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
   tee /etc/apt/sources.list.d/docker.list > /dev/null
 # 更新索引文件并安装 Docker 相关组件
