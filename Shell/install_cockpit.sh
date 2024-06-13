@@ -1,12 +1,11 @@
 #!/bin/bash
 
-# 启用向后移植存储库
-os_codename=$(awk -F= '/VERSION_CODENAME/{print $2}' /etc/os-release)
-echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware" > /etc/apt/sources.list.d/backports.list
-
 # 配置45Drives Repo安装脚本（用于安装Navigator、File Sharing、Identities组件）
 curl -sSL https://repo.45drives.com/setup | bash
 apt update
+
+# 获取系统版本代号
+os_codename=$(awk -F= '/VERSION_CODENAME/{print $2}' /etc/os-release)
 
 # 安装Cockpit及其附属组件（Navigator、File Sharing、Identities组件）
 apt install -y -t "$os_codename-backports" cockpit cockpit-pcp cockpit-navigator cockpit-file-sharing cockpit-identities
