@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 使用清华大学镜像源安装Docker
+# 使用华为镜像源安装Docker
 # 安装依赖
 apt-get install ca-certificates curl gnupg
 # 信任 Docker 的 GPG 公钥并添加仓库
