@@ -22,7 +22,7 @@ function configure_timeout_and_logging {
         cat << EOF >> /etc/profile
 
 # 超时自动退出
-TMOUT=180
+TMOUT=900
 # 在历史命令中启用时间戳
 export HISTTIMEFORMAT="%F %T "
 # 记录所有用户的登录和操作日志
