@@ -66,39 +66,41 @@ issue_file="/etc/cockpit/issue.cockpit"
 
 # 检查是否需要设置Cockpit外网访问
 read -p "是否设置Cockpit外网访问？(y/n): " response
-
-# 删除配置参数函数
-delete_params() {
-    sed -i '/Origins/d' "$cockpit_conf"
-    sed -i '/Access-Control-Allow-Origin/d' "$cockpit_conf"
-    echo "已删除Cockpit外网访问相关配置。"
-}
-
-# 设置配置参数函数
-set_params() {
-    internal_subnet=$(hostname -I | awk '{print $1}' | sed -E 's/\.[0-9]+$/\.0\/24/')
-    if grep -q "Origins" "$cockpit_conf"; then
-        sed -i "s#^Origins = .*#Origins = https://$domain wss://$domain#" "$cockpit_conf"
+config_file="/etc/cockpit/cockpit.conf"
+if [[ -z "$response" || "$response" == "n" ]]; then
+    # 用户不做回应或者回答n
+    if [[ -f "$config_file" ]]; then
+        if grep -q "Origins" "$config_file"; then
+            # 删除Origins参数行
+            sed -i '/Origins/d' "$config_file"
+            echo "已跳过Cockpit外网访问配置，并删除对应外网访问参数。"
+        else
+            echo "已跳过Cockpit外网访问配置，且检查没有配置外网访问参数。"
+        fi
     else
-        sed -i "/\[WebService\]/a Origins = https://$domain wss://$domain" "$cockpit_conf"
+        echo "已跳过Cockpit外网访问配置。"
     fi
-    if grep -q "Access-Control-Allow-Origin" "$cockpit_conf"; then
-        sed -i "s#^Access-Control-Allow-Origin: .*#Access-Control-Allow-Origin: https://$internal_subnet#" "$cockpit_conf"
+else
+    # 提示用户输入外网访问域名
+    read -p "请输入Cockpit外网访问地址（如有端口号需一并输入）： " domain
+
+    # 移除输入中的协议部分
+    domain=$(echo "$domain" | sed -E 's#^https?://##')
+
+    # 提取当前主机内网IP地址
+    internal_ip=$(hostname -I | awk '{print $1}')
+    # 配置Cockpit的Origins参数
+    if [[ -f "$config_file" ]]; then
+        if grep -q "Origins" "$config_file"; then
+            sed -i "s#^Origins = .*#Origins = https://$domain wss://$domain https://$internal_ip:9090#" "$config_file"
+        else
+            sed -i "/\[WebService\]/a Origins = https://$domain wss://$domain https://$internal_ip:9090" "$config_file"
+        fi
     else
-        sed -i "/Origins = /a Access-Control-Allow-Origin: https://$internal_subnet" "$cockpit_conf"
+        echo "[WebService]" > "$config_file"
+        echo "Origins = https://$domain wss://$domain https://$internal_ip:9090" >> "$config_file"
     fi
     echo "已设置Cockpit外网访问域名：https://$domain"
-    echo "已设置内网访问地址段：https://$internal_subnet"
-}
-
-if [[ -z "$response" || "$response" == "n" ]]; then
-    [[ -f "$cockpit_conf" ]] && delete_params
-    echo "已跳过Cockpit外网访问配置。"
-else
-    read -p "请输入Cockpit外网访问域名和端口号（例如 example.com:9090）： " domain
-    domain=$(echo "$domain" | sed -E 's#^https?://##')
-    [[ ! -f "$cockpit_conf" ]] && echo "[WebService]" > "$cockpit_conf"
-    set_params
 fi
 
 echo "Cockpit调优配置完成。"
