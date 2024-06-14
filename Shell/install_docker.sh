@@ -19,6 +19,74 @@ apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin do
 first_user=$(awk -F: '$3>=1000 && $1 != "nobody" {print $1}' /etc/passwd | sort | head -n 1)
 usermod -aG docker "$first_user"
 
+
+# 定义镜像加速地址
+MIRRORS=(
+  "https://docker.1panel.live"
+  "https://hub.iyuu.cn"
+)
+
+# 定义配置文件路径
+DAEMON_JSON="/etc/docker/daemon.json"
+
+# 函数：将数组转换为 JSON 数组字符串，每行一个地址
+array_to_json_array() {
+  local arr=("$@")
+  local json_array="["
+
+  for i in "${!arr[@]}"; do
+    json_array+="\n    \"${arr[$i]}\""
+    if [ "$i" -lt $((${#arr[@]} - 1)) ]; then
+      json_array+=","
+    fi
+  done
+
+  json_array+="\n  ]"
+  echo -e "$json_array"
+}
+
+# 函数：更新配置文件中的 registry-mirrors
+update_registry_mirrors() {
+  local new_mirrors=("$@")
+  local existing_mirrors=()
+
+  # 如果配置文件存在，则读取现有的镜像地址
+  if [ -f "$DAEMON_JSON" ]; then
+    while IFS= read -r line; do
+      if [[ $line =~ https?:// ]]; then
+        existing_mirrors+=("$(echo $line | tr -d '",')")
+      fi
+    done < <(grep -oP '"https?://[^"]+"' "$DAEMON_JSON")
+  fi
+
+  # 添加新镜像地址，避免重复
+  for mirror in "${new_mirrors[@]}"; do
+    if [[ ! " ${existing_mirrors[@]} " =~ " ${mirror} " ]]; then
+      existing_mirrors+=("$mirror")
+    fi
+  done
+
+  # 生成新的 JSON 内容
+  local updated_mirrors_json
+  updated_mirrors_json=$(array_to_json_array "${existing_mirrors[@]}")
+
+  {
+    echo "{"
+    echo "  \"registry-mirrors\": $updated_mirrors_json"
+    echo "}"
+  } > "$DAEMON_JSON"
+}
+
+# 更新配置文件
+update_registry_mirrors "${MIRRORS[@]}"
+
+# 重新加载并重新启动 Docker 服务以应用更改
+systemctl daemon-reload
+systemctl restart docker
+
+echo "Docker 镜像加速地址配置已完成。"
+
+
 # 检查是否已经部署了同名容器
 check_container_existence() {
     docker ps -a --format "{{.Names}}" | grep -qFx "$1"
