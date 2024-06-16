@@ -29,20 +29,11 @@ MIRRORS=(
 # 定义配置文件路径
 DAEMON_JSON="/etc/docker/daemon.json"
 
-# 函数：将数组转换为 JSON 数组字符串，每行一个地址
+# 函数：将数组转换为 JSON 数组字符串
 array_to_json_array() {
   local arr=("$@")
-  local json_array="["
-
-  for i in "${!arr[@]}"; do
-    json_array+="\n    \"${arr[$i]}\""
-    if [ "$i" -lt $((${#arr[@]} - 1)) ]; then
-      json_array+=","
-    fi
-  done
-
-  json_array+="\n  ]"
-  echo -e "$json_array"
+  local json_array=$(printf ',\n    "%s"' "${arr[@]}")
+  echo -e "[${json_array:1}\n  ]"
 }
 
 # 函数：更新配置文件中的 registry-mirrors
@@ -52,16 +43,12 @@ update_registry_mirrors() {
 
   # 如果配置文件存在，则读取现有的镜像地址
   if [ -f "$DAEMON_JSON" ]; then
-    while IFS= read -r line; do
-      if [[ $line =~ https?:// ]]; then
-        existing_mirrors+=("$(echo $line | tr -d '",')")
-      fi
-    done < <(grep -oP '"https?://[^"]+"' "$DAEMON_JSON")
+    existing_mirrors=($(grep -oP '"https?://[^"]+"' "$DAEMON_JSON" | tr -d '"'))
   fi
 
   # 添加新镜像地址，避免重复
   for mirror in "${new_mirrors[@]}"; do
-    if [[ ! " ${existing_mirrors[@]} " =~ " ${mirror} " ]]; then
+    if [[ ! " ${existing_mirrors[*]} " =~ " ${mirror} " ]]; then
       existing_mirrors+=("$mirror")
     fi
   done
@@ -70,6 +57,7 @@ update_registry_mirrors() {
   local updated_mirrors_json
   updated_mirrors_json=$(array_to_json_array "${existing_mirrors[@]}")
 
+  # 更新配置文件
   {
     echo "{"
     echo "  \"registry-mirrors\": $updated_mirrors_json"
