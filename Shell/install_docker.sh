@@ -126,6 +126,7 @@ if $install_dockge; then
 services:
   dockge:
     image: louislam/dockge:1
+    container_name: dockge
     restart: unless-stopped
     ports:
       # Host Port : Container Port
