@@ -31,6 +31,11 @@ declare -A COLORS=(
     [RESET]="\033[0m"
 )
 
+# 检查是否存在 debian-homenas 目录，不存在则创建
+if [ ! -d "$DEBIAN_HOMENAS_DIR" ]; then
+    mkdir -p "$DEBIAN_HOMENAS_DIR"
+fi
+
 # 函数：打印带颜色的输出
 color_print() {
     local color="$1"
@@ -49,7 +54,6 @@ download_file() {
 
 # 函数：下载所有脚本
 download_all_scripts() {
-    mkdir -p "$DEBIAN_HOMENAS_DIR"
     for file in "${SCRIPT_URLS[@]}"; do
         download_file "${file}"
     done
