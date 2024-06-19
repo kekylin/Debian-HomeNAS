@@ -65,6 +65,3 @@ if [ "$docker_status" == "active" ]; then
     dockge_status=$(check_docker_container_running "dockge")
     print_service_status "Dockge" "http://$host_ip:5001" "$dockge_status"
 fi
-
-# 重启提示语
-echo -e "${green}脚本已运行完毕，请重启系统后再使用。${reset}"
