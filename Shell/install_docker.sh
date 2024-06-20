@@ -60,7 +60,7 @@ update_registry_mirrors() {
 }
 
 # 主逻辑
-read -p "是否需要配置Docker镜像加速地址？(y/n): " choice
+read -p "是否配置Docker镜像加速地址？(y/n): " choice
 if [[ "$choice" =~ ^[Yy]$ ]]; then
   update_registry_mirrors "${MIRRORS[@]}"
   systemctl daemon-reload
