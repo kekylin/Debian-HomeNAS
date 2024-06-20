@@ -7,7 +7,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /opt/docker/portainer_zh-cn:/data
-    image: 6053537/portainer
+    image: 6053537/portainer-ce
     network_mode: bridge
 networks:
   bridge:
