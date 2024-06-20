@@ -20,20 +20,22 @@ first_user=$(awk -F: '$3>=1000 && $1 != "nobody" {print $1}' /etc/passwd | sort 
 usermod -aG docker "$first_user"
 
 
-# 定义镜像加速地址
-MIRRORS=(
-  "https://docker.1panel.live"
-  "https://hub.iyuu.cn"
-)
-
-# 定义配置文件路径
+# 配置Docker镜像加速地址
+MIRRORS=("https://docker.1panel.live" "https://hub.iyuu.cn")
 DAEMON_JSON="/etc/docker/daemon.json"
 
 # 函数：将数组转换为 JSON 数组字符串
 array_to_json_array() {
   local arr=("$@")
-  local json_array=$(printf ',\n    "%s"' "${arr[@]}")
-  echo -e "[${json_array:1}\n  ]"
+  local json_array="[\n"
+  local len=${#arr[@]}
+  for ((i = 0; i < len; i++)); do
+    json_array+="    \"${arr[i]}\""
+    [[ $i -lt $((len - 1)) ]] && json_array+=","
+    json_array+="\n"
+  done
+  json_array+="  ]"
+  echo -e "$json_array"
 }
 
 # 函数：更新配置文件中的 registry-mirrors
@@ -41,16 +43,12 @@ update_registry_mirrors() {
   local new_mirrors=("$@")
   local existing_mirrors=()
 
-  # 如果配置文件存在，则读取现有的镜像地址
-  if [ -f "$DAEMON_JSON" ]; then
-    existing_mirrors=($(grep -oP '"https?://[^"]+"' "$DAEMON_JSON" | tr -d '"'))
-  fi
+  # 读取现有的镜像地址
+  [ -f "$DAEMON_JSON" ] && existing_mirrors=($(grep -oP '"https?://[^"]+"' "$DAEMON_JSON" | tr -d '"'))
 
   # 添加新镜像地址，避免重复
   for mirror in "${new_mirrors[@]}"; do
-    if [[ ! " ${existing_mirrors[*]} " =~ " ${mirror} " ]]; then
-      existing_mirrors+=("$mirror")
-    fi
+    [[ ! " ${existing_mirrors[*]} " =~ " ${mirror} " ]] && existing_mirrors+=("$mirror")
   done
 
   # 生成新的 JSON 内容
@@ -58,98 +56,16 @@ update_registry_mirrors() {
   updated_mirrors_json=$(array_to_json_array "${existing_mirrors[@]}")
 
   # 更新配置文件
-  {
-    echo "{"
-    echo "  \"registry-mirrors\": $updated_mirrors_json"
-    echo "}"
-  } > "$DAEMON_JSON"
+  echo -e "{\n  \"registry-mirrors\": $updated_mirrors_json\n}" > "$DAEMON_JSON"
 }
 
-# 更新配置文件
-update_registry_mirrors "${MIRRORS[@]}"
-
-# 重新加载并重新启动 Docker 服务以应用更改
-systemctl daemon-reload
-systemctl restart docker
-
-echo "Docker 镜像加速地址配置已完成。"
-
-
-# 检查是否已经部署了同名容器
-check_container_existence() {
-    docker ps -a --format "{{.Names}}" | grep -qFx "$1"
-}
-
-# 询问用户需要安装哪些组件
-echo "选择安装Docker管理工具: 
-1) Portainer 
-2) Dockge 
-3) 全部安装 
-0) 不安装 (默认: 0)"
-read -p "请输入选择: " install_choice
-install_choice=${install_choice:-0}
-
-# 设置安装标志
-install_portainer=false
-install_dockge=false
-
-case "$install_choice" in
-    1) install_portainer=true ;;
-    2) install_dockge=true ;;
-    3) install_portainer=true; install_dockge=true ;;
-esac
-
-# 安装 Docker 管理工具 Portainer
-if $install_portainer; then
-    if check_container_existence "portainer"; then
-        echo "Portainer 容器已经存在，跳过安装。"
-    else
-        docker volume create portainer_data 2>/dev/null
-        docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always \
-            -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data \
-            portainer/portainer-ce:latest
-    fi
+# 主逻辑
+read -p "是否需要配置Docker镜像加速地址？(y/n): " choice
+if [[ "$choice" =~ ^[Yy]$ ]]; then
+  update_registry_mirrors "${MIRRORS[@]}"
+  systemctl daemon-reload
+  systemctl restart docker
+  echo "Docker镜像加速地址配置已完成。"
 else
-    echo "跳过 Portainer 安装。"
-fi
-
-# 安装 Docker 管理工具 Dockge
-if $install_dockge; then
-    if check_container_existence "dockge"; then
-        echo "Dockge 容器已经存在，跳过安装。"
-    else
-        sudo mkdir -p /opt/stacks /opt/dockge
-        cd /opt/dockge || exit
-
-        # 创建 Docker Compose 文件
-        sudo tee docker-compose.yml > /dev/null <<EOF
-services:
-  dockge:
-    image: louislam/dockge:1
-    container_name: dockge
-    restart: unless-stopped
-    ports:
-      # Host Port : Container Port
-      - 5001:5001
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./data:/app/data
-        
-      # If you want to use private registries, you need to share the auth file with Dockge:
-      # - /root/.docker/:/root/.docker
-
-      # Stacks Directory
-      # ⚠️ READ IT CAREFULLY. If you did it wrong, your data could end up writing into a WRONG PATH.
-      # ⚠️ 1. FULL path only. No relative path (MUST)
-      # ⚠️ 2. Left Stacks Path === Right Stacks Path (MUST)
-      - /opt/stacks:/opt/stacks
-    environment:
-      # Tell Dockge where is your stacks directory
-      - DOCKGE_STACKS_DIR=/opt/stacks
-EOF
-
-        sudo docker compose up -d
-    fi
-else
-    echo "跳过 Dockge 安装。"
+  echo "跳过Docker镜像加速地址配置。"
 fi
