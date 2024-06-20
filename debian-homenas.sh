@@ -11,6 +11,7 @@ SCRIPT_URLS=(
     "install_docker.sh"
     "install_firewalld.sh"
     "install_fail2ban.sh"
+    "deploy-containers.sh"
     "service_checker.sh"
 )
 SCRIPT_ALIASES=(
@@ -21,6 +22,7 @@ SCRIPT_ALIASES=(
     "安装Docker服务"
     "安装防火墙服务"
     "安装自动封锁服务"
+    "安装容器应用服务"
     "服务运行状态提示"
 )
 
@@ -62,7 +64,7 @@ show_menu() {
     for ((i = 0; i < ${#SCRIPT_ALIASES[@]}; i++)); do
         color_print 35 "$((i + 1)). ${SCRIPT_ALIASES[i]}"
     done
-    color_print 35 "9. 执行全部脚本"
+    color_print 35 "99. 执行全部脚本"
     color_print 35 "0. 退出"
     color_print 34 "=================================================="
     echo -n -e "\033[34m请输入脚本编号：\033[0m"
@@ -86,11 +88,11 @@ while true; do
 
     for choice in "${choices[@]}"; do
         case "$choice" in
-            [1-8])
+            [1-9])
                 index=$((choice - 1))
                 execute_script "${SCRIPT_URLS[index]}" "${SCRIPT_ALIASES[index]}"
                 ;;
-            9)
+            99)
                 for ((i = 0; i < ${#SCRIPT_URLS[@]}; i++)); do
                     execute_script "${SCRIPT_URLS[i]}" "${SCRIPT_ALIASES[i]}"
                 done
