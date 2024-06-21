@@ -8,9 +8,9 @@ SCRIPT_URLS=(
     "install_cockpit.sh"
     "email_config.sh"
     "system_security.sh"
-    "install_docker.sh"
     "install_firewalld.sh"
     "install_fail2ban.sh"
+    "install_docker.sh"
     "deploy-containers.sh"
     "service_checker.sh"
 )
@@ -19,9 +19,9 @@ SCRIPT_ALIASES=(
     "安装系统管理面板"
     "配置邮件发送服务"
     "配置系统安全防护"
-    "安装Docker服务"
     "安装防火墙服务"
     "安装自动封锁服务"
+    "安装Docker服务"
     "安装容器应用服务"
     "服务运行状态提示"
 )
