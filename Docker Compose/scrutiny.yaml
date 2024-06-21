@@ -12,7 +12,7 @@ services:
       - SYS_RAWIO
       - SYS_ADMIN
     ports:
-      - "8080:8080" # webapp
+      - "9626:8080" # webapp
       - "8086:8086" # influxDB admin
     volumes:
       - /run/udev:/run/udev:ro
@@ -20,7 +20,6 @@ services:
       - /opt/docker/scrutiny/influxdb:/opt/scrutiny/influxdb
     devices:
       - "/dev/sda"
-      - "/dev/sdb"
     network_mode: bridge
 networks:
   bridge:
