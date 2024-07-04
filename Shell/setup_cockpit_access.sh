@@ -36,3 +36,6 @@ else
     fi
     echo "已设置Cockpit外网访问域名：https://$domain"
 fi
+
+# 重启cockpit服务
+systemctl try-restart cockpit
