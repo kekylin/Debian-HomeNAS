@@ -23,3 +23,6 @@ if [[ $install_machines == "y" ]]; then
 else
     echo "已跳过虚拟机组件安装。"
 fi
+
+# 重启cockpit服务
+systemctl try-restart cockpit
