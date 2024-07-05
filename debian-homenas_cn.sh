@@ -82,11 +82,11 @@ handle_main_menu() {
         case "$choice" in
             99)
                 for index in ${menu_actions["99"]}; do
-                    execute_script "$index" "${menu_lines[$((index + 1))]}"
+                    execute_script "$index" "${menu_lines[$index]}"
                 done
                 ;;
             1|3|6)
-                execute_script "${menu_actions[$choice]}" "${menu_lines[$choice]}"
+                execute_script "${menu_actions[$choice]}" "${menu_lines[${menu_actions[$choice]}]}"
                 ;;
             2|4|5)
                 handle_submenu "$choice"
@@ -186,12 +186,19 @@ declare -A menu_actions=(
 
 # 菜单项及其显示名称
 declare -A menu_lines=(
-    [1]="系统初始配置"
-    [2]="系统管理面板"
-    [3]="邮件通知服务"
-    [4]="系统安全防护"
-    [5]="Docker服务"
-    [6]="安装服务查询"
+    [0]="系统初始配置"
+    [1]="安装面板Cockpit"
+    [2]="安装虚拟机组件"
+    [3]="外网访问Cockpit"
+    [4]="邮件通知服务"
+    [5]="配置基础安全防护"
+    [6]="安装防火墙服务"
+    [7]="安装自动封锁服务"
+    [8]="安装Docker"
+    [9]="添加镜像地址"
+    [10]="安装容器管理"
+    [11]="备份与恢复"
+    [12]="安装服务查询"
     [99]="一键配置HomeNAS"
 )
 
