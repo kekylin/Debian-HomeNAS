@@ -36,6 +36,3 @@ else
         sed -i '/<forward\/>/i \  <service name="cockpit"/>' "$CONFIG_FILE"
     fi
 fi
-
-# 启动 firewalld 服务
-systemctl start firewalld
