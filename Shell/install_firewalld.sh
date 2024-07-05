@@ -5,16 +5,12 @@ declare -r CONFIG_FILE="/etc/firewalld/zones/public.xml"
 # 读取用户输入
 read -p "是否安装防火墙Firewalld? (y/n): " choice
 
-case "$choice" in
-    [Yy])
-        # 安装 firewalld
-        apt update -y && apt install firewalld -y
-        ;;
-    *)
-        echo "跳过安装防火墙Firewalld."
-        exit 0
-        ;;
-esac
+if [[ "$choice" =~ ^[Yy]$ ]]; then
+    # 安装 firewalld
+    apt update -y && apt install firewalld -y
+else
+    echo "跳过安装防火墙Firewalld."
+fi
 
 # 停止 firewalld 服务
 systemctl stop firewalld
