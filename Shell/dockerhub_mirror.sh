@@ -1,4 +1,6 @@
-# 配置Docker镜像加速地址
+#!/bin/bash
+
+# Docker 镜像加速地址
 MIRRORS=("https://docker.1panel.live" "https://hub.iyuu.cn")
 DAEMON_JSON="/etc/docker/daemon.json"
 
@@ -50,11 +52,6 @@ reload_and_restart_docker() {
 }
 
 # 主逻辑
-read -rp "是否配置Docker镜像加速地址？(y/n): " choice
-if [[ "$choice" =~ ^[Yy]$ ]]; then
-    update_registry_mirrors "${MIRRORS[@]}"
-    reload_and_restart_docker
-    echo "Docker镜像加速地址配置已完成。"
-else
-    echo "跳过Docker镜像加速地址配置。"
-fi
+update_registry_mirrors "${MIRRORS[@]}"
+reload_and_restart_docker
+echo "Docker镜像加速地址配置已完成。"
