@@ -4,7 +4,7 @@
 function configure_su_restrictions {
     # 检查是否已经配置了对应的参数
     if grep -q "sudo" /etc/pam.d/su; then
-        echo "已配置su限制，跳过配置。"
+        echo "已配置su限制，跳过操作。"
     else
         # 在文件首行插入内容
         sed -i '1i auth required pam_wheel.so group=sudo' /etc/pam.d/su
@@ -16,7 +16,7 @@ function configure_su_restrictions {
 function configure_timeout_and_logging {
     # 检查是否已经配置了对应的参数
     if grep -q "TMOUT\|history" /etc/profile; then
-        echo "已配置超时和命令记录日志，跳过配置。"
+        echo "已配置超时和命令记录日志，跳过操作。"
     else
         # 追加内容到文件末尾
         cat << EOF >> /etc/profile
@@ -87,7 +87,7 @@ EOF
 
         # 检查是否已经配置了对应的参数
         if grep -q "login-notifiy.sh" /etc/pam.d/common-session; then
-            echo "已配置用户登录系统发送邮件告警，跳过配置。"
+            echo "已配置用户登录系统发送邮件告警，跳过操作。"
         else
             # 在/etc/pam.d/common-session配置文件末行追加内容
             echo "session optional pam_exec.so debug /bin/bash /etc/pam.d/login-notifiy.sh" >> /etc/pam.d/common-session
@@ -99,7 +99,7 @@ EOF
             sed -i '/login-notifiy.sh/d' /etc/pam.d/common-session
             echo "已删除用户登录系统发送邮件告警配置。"
         else
-            echo "未设置用户登录系统发送邮件告警，跳过配置。"
+            echo "未设置用户登录系统发送邮件告警，跳过操作。"
         fi
     fi
 }
