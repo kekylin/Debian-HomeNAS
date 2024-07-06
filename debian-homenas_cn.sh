@@ -65,7 +65,7 @@ show_welcome() {
     color_print $COLOR_BLUE "=================================================="
     echo -e "                 Debian HomeNAS\n\n                                  QQ群：339169752\n作者：kekylin\n项目：https://github.com/kekylin/Debian-HomeNAS"
     if [ "$first_run" = true ]; then
-        color_print $COLOR_GREEN "--------------------------------------------------\n温馨提示！\n1、系统安装后首次运行，建议执行“一键配置HomeNAS”。\n2、安装防火墙后重启一次系统再使用。"
+        color_print $COLOR_GREEN "--------------------------------------------------\n温馨提示！\n1、系统安装后首次运行，建议执行“一键配置HomeNAS”。\n2、安装防火墙后重启一次系统再使用。\n3、一级和二级菜单都支持多选，空格分隔（如：1 3 5）。"
     fi
 }
 
@@ -78,27 +78,29 @@ handle_main_menu() {
     while true; do
         show_welcome
         show_menu "$main_menu"
-        read -r choice
-        case "$choice" in
-            99)
-                for index in ${menu_actions["99"]}; do
-                    execute_script "$index" "${menu_lines[$index]}"
-                done
-                ;;
-            1|3|6)
-                execute_script "${menu_actions[$choice]}" "${menu_lines[${menu_actions[$choice]}]}"
-                ;;
-            2|4|5)
-                handle_submenu "$choice"
-                ;;
-            0)
-                color_print $COLOR_BLUE "退出脚本。"
-                exit 0
-                ;;
-            *)
-                color_print $COLOR_RED "\n无效选择：$choice。请重新输入。\n"
-                ;;
-        esac
+        read -r -a choices
+        for choice in "${choices[@]}"; do
+            case "$choice" in
+                99)
+                    for index in ${menu_actions["99"]}; do
+                        execute_script "$index" "${menu_lines[$index]}"
+                    done
+                    ;;
+                1|3|6)
+                    execute_script "${menu_actions[$choice]}" "${menu_lines[${menu_actions[$choice]}]}"
+                    ;;
+                2|4|5)
+                    handle_submenu "$choice"
+                    ;;
+                0)
+                    color_print $COLOR_BLUE "退出脚本。"
+                    exit 0
+                    ;;
+                *)
+                    color_print $COLOR_RED "\n无效选择：$choice。请重新输入。\n"
+                    ;;
+            esac
+        done
         first_run=false
     done
 }
@@ -112,19 +114,21 @@ handle_submenu() {
 
     while true; do
         show_menu "${submenus[$submenu]}"
-        read -r sub_choice
-        case "$sub_choice" in
-            0)
-                break
-                ;;
-            *)
-                if [[ $sub_choice =~ ^[1-4]$ ]] && [ "$sub_choice" -le "${#actions[@]}" ]; then
-                    execute_script "${actions[$((sub_choice - 1))]}" "${submenu_lines[$((sub_choice - 1))]}"
-                else
-                    color_print $COLOR_RED "\n无效选择：$sub_choice。请重新输入。\n"
-                fi
-                ;;
-        esac
+        read -r -a sub_choices
+        for sub_choice in "${sub_choices[@]}"; do
+            case "$sub_choice" in
+                0)
+                    return
+                    ;;
+                *)
+                    if [[ $sub_choice =~ ^[1-4]$ ]] && [ "$sub_choice" -le "${#actions[@]}" ]; then
+                        execute_script "${actions[$((sub_choice - 1))]}" "${submenu_lines[$((sub_choice - 1))]}"
+                    else
+                        color_print $COLOR_RED "\n无效选择：$sub_choice。请重新输入。\n"
+                    fi
+                    ;;
+            esac
+        done
     done
 }
 
