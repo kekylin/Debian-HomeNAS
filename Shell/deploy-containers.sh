@@ -43,7 +43,7 @@ install_container() {
 # 显示菜单并处理用户输入（按照容器名称排序）
 show_menu() {
     local choices=()
-    echo "菜单："
+    echo "可安装容器应用："
     for name in "${!containers[@]}"; do
         choices+=("$name")
     done
