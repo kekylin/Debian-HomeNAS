@@ -53,9 +53,9 @@ EOF
 
 # 3. 用户登录系统发送邮件告警
 function configure_login_notification {
-    read -p "是否设置用户登录系统发送邮件告警？(y/n): " choice
+    read -p "设置用户登录通知(y)，取消用户登录通知(n)，请输入(y/n): " choice
     if [ "$choice" == "y" ]; then
-        read -p "请输入接收告警通知邮箱地址: " email
+        read -p "请输入接收通知邮箱地址: " email
         # 检查是否已存在/etc/pam.d/login-notifiy.sh配置文件
         if [ -f "/etc/pam.d/login-notifiy.sh" ]; then
             # 清空文件内容
@@ -81,25 +81,25 @@ echo "日期: \`date '+%Y年%m月%d日%H时%M分%S秒'\`"
 echo "服务器: \`uname -s -n -r\`"
 } | mail -s "注意! 用户\$PAM_USER正通过\$PAM_SERVICE服务登录\`hostname -s | awk '{print toupper(substr(\$0,1,1)) substr(\$0,2)}'\`系统" $email
 EOF
-        echo "已配置用户登录系统发送邮件告警。"
+        echo "配置通知脚本..."
         # 修改权限
         chmod +x /etc/pam.d/login-notifiy.sh
 
         # 检查是否已经配置了对应的参数
         if grep -q "login-notifiy.sh" /etc/pam.d/common-session; then
-            echo "已配置用户登录系统发送邮件告警，跳过操作。"
+            echo "已设置用户登录通知，跳过操作。"
         else
             # 在/etc/pam.d/common-session配置文件末行追加内容
             echo "session optional pam_exec.so debug /bin/bash /etc/pam.d/login-notifiy.sh" >> /etc/pam.d/common-session
-            echo "已添加用户登录系统发送邮件告警。"
+            echo "完成用户登录通知设置。"
         fi
     else
         # 如果用户选择不设置通知，则检查并删除已有的配置
         if grep -q "login-notifiy.sh" /etc/pam.d/common-session; then
             sed -i '/login-notifiy.sh/d' /etc/pam.d/common-session
-            echo "已删除用户登录系统发送邮件告警配置。"
+            echo "已取消用户登录通知。"
         else
-            echo "未设置用户登录系统发送邮件告警，跳过操作。"
+            echo "未设置用户登录通知，跳过操作。"
         fi
     fi
 }
