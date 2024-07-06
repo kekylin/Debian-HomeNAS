@@ -1,15 +1,11 @@
 #!/bin/bash
 
-# 询问用户是否安装Fail2ban
-read -p "是否安装防攻击程序Fail2ban？(y/n): " install_fail2ban
+# 安装Fail2ban
+apt install fail2ban -y
 
-if [[ $install_fail2ban == "y" ]]; then
-    # 安装Fail2ban
-    sudo apt install fail2ban -y
-
-    # 复制并配置jail.local
-    sudo cp /etc/fail2ban/jail.{conf,local}
-    cat <<EOT | sudo tee /etc/fail2ban/jail.local >/dev/null
+# 复制并配置jail.local
+cp /etc/fail2ban/jail.{conf,local}
+cat <<EOT | tee /etc/fail2ban/jail.local >/dev/null
 #全局设置
 [DEFAULT]
 
@@ -59,9 +55,9 @@ filter      = sshd
 logpath     = /var/log/auth.log
 EOT
 
-    # 复制并配置mail-whois.local
-    sudo cp /etc/fail2ban/action.d/mail-whois.{conf,local}
-    cat <<EOT | sudo tee /etc/fail2ban/action.d/mail-whois.local >/dev/null
+# 复制并配置mail-whois.local
+cp /etc/fail2ban/action.d/mail-whois.{conf,local}
+cat <<EOT | tee /etc/fail2ban/action.d/mail-whois.local >/dev/null
 [INCLUDES]
 before = mail-whois-common.conf
 
@@ -77,41 +73,37 @@ name = default
 dest = root
 EOT
 
-    # 获取用户输入的邮件地址，如果未输入，则使用默认值
-    read -p "请输入接收Fail2ban告警通知邮箱账户: " dest_email
-    dest_email="${dest_email:-root@localhost}"
+# 获取用户输入的邮件地址，如果未输入，则使用默认值
+read -p "请输入接收Fail2ban告警通知邮箱账户: " dest_email
+dest_email="${dest_email:-root@localhost}"
 
-    # 提取发送者邮箱地址
-    sender_email=$(awk -F ': ' '/^root:/ {print $2}' /etc/email-addresses)
+# 提取发送者邮箱地址
+sender_email=$(awk -F ': ' '/^root:/ {print $2}' /etc/email-addresses)
 
-    # 如果在/etc/email-addresses文件中找不到root:内容，则使用默认值root@<fq-hostname>
-    if [[ -z "$sender_email" ]]; then
-        sender_email="root@<fq-hostname>"
-    fi
+# 如果在/etc/email-addresses文件中找不到root:内容，则使用默认值root@<fq-hostname>
+if [[ -z "$sender_email" ]]; then
+    sender_email="root@<fq-hostname>"
+fi
 
-    # 输出提取通知发送邮箱地址
-    echo "Fail2ban通知发送邮箱地址为: $sender_email"
+# 输出提取通知发送邮箱地址
+echo "Fail2ban告警通知发送邮箱账户: $sender_email"
 
-    # 替换配置文件中的邮箱地址
-    sudo sed -i "s/destemail = .*/destemail = $dest_email/g" /etc/fail2ban/jail.local
-    sudo sed -i "s/sender = .*/sender = $sender_email/g" /etc/fail2ban/jail.local
+# 输出接收Fail2ban告警通知邮箱账户
+echo "Fail2ban告警通知接收邮箱账户: $dest_email"
 
+# 替换配置文件中的邮箱地址
+sed -i "s/destemail = .*/destemail = $dest_email/g" /etc/fail2ban/jail.local
+sed -i "s/sender = .*/sender = $sender_email/g" /etc/fail2ban/jail.local
 
-    # 检查是否已配置防暴力攻击Cockpit Web登陆窗口，如果没有则配置
-    if ! grep -q "\[pam-generic\]" /etc/fail2ban/jail.d/defaults-debian.conf; then
-        sudo tee -a /etc/fail2ban/jail.d/defaults-debian.conf >/dev/null <<EOT
+# 检查是否已配置防暴力攻击Cockpit Web登陆窗口，如果没有则配置
+if ! grep -q "\[pam-generic\]" /etc/fail2ban/jail.d/defaults-debian.conf; then
+    tee -a /etc/fail2ban/jail.d/defaults-debian.conf >/dev/null <<EOT
 [pam-generic]
 enabled = true
 EOT
-    fi
-
-    # 启动Fail2ban
-    sudo systemctl start fail2ban
-
-    echo "Fail2ban安装和配置完成！"
-
-elif [[ $install_fail2ban == "n" ]]; then
-    echo "已跳过Fail2ban安装和配置。"
-else
-    echo "已跳过Fail2ban安装和配置。"
 fi
+
+# 启动Fail2ban
+systemctl start fail2ban
+
+echo "Fail2ban安装和配置完成！"
