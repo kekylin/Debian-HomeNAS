@@ -55,7 +55,7 @@ EOF
 function configure_login_notification {
     read -p "是否设置用户登录系统发送邮件告警？(y/n): " choice
     if [ "$choice" == "y" ]; then
-        read -p "请输入邮箱地址: " email
+        read -p "请输入接收告警通知邮箱地址: " email
         # 检查是否已存在/etc/pam.d/login-notifiy.sh配置文件
         if [ -f "/etc/pam.d/login-notifiy.sh" ]; then
             # 清空文件内容
