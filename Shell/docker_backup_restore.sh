@@ -166,9 +166,9 @@ restore_files() {
 
 main() {
     while true; do
-        echo "1) 备份"
-        echo "2) 恢复"
-        echo "q) 退出"
+        echo "1) 备份Docker"
+        echo "2) 恢复Docker"
+        echo "0) 退出"
         read -p "请选择操作：" opt
         case $opt in
             1)
@@ -192,7 +192,7 @@ main() {
                     echo "输入的恢复文件路径无效，请重新输入。"
                 fi
                 ;;
-            q)
+            0)
                 echo "退出程序。"
                 break
                 ;;
