@@ -1,5 +1,5 @@
 # 设置Cockpit外网访问或删除外网访问配置
-read -p "配置外网访问(y) 删除外网访问配置(n)，请输入(y/n): " response
+read -p "设置外网访问(y) 跳过/删除外网访问设置(n)，请输入(y/n): " response
 config_file="/etc/cockpit/cockpit.conf"
 if [[ -z "$response" || "$response" == "n" ]]; then
     # 用户不做回应或者回答n
@@ -7,12 +7,12 @@ if [[ -z "$response" || "$response" == "n" ]]; then
         if grep -q "Origins" "$config_file"; then
             # 删除Origins参数行
             sed -i '/Origins/d' "$config_file"
-            echo "已删除对应外网访问参数。"
+            echo "已删除外网访问设置。"
         else
-            echo "检查没有配置外网访问参数，跳过操作。"
+            echo "已跳过外网访问设置。"
         fi
     else
-        echo "已跳过Cockpit外网访问配置。"
+        echo "已跳过Cockpit外网访问设置。"
     fi
 else
     # 提示用户输入外网访问域名
@@ -34,5 +34,5 @@ else
         echo "[WebService]" > "$config_file"
         echo "Origins = https://$domain wss://$domain https://$internal_ip:9090" >> "$config_file"
     fi
-    echo "已设置Cockpit外网访问域名：https://$domain"
+    echo "Cockpit外网访问地址：https://$domain"
 fi
