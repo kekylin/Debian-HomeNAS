@@ -9,19 +9,22 @@ COLOR_BLUE="34"
 
 # 脚本文件列表
 SCRIPT_URLS=(
-    "system_init.sh"             # 0  系统初始配置
-    "install_cockpit.sh"         # 1  安装面板Cockpit
-    "install_virtualization.sh"  # 2  安装虚拟机组件
-    "setup_cockpit_access.sh"    # 3  外网访问Cockpit
-    "email_config.sh"            # 4  邮件通知服务
-    "system_security.sh"         # 5  配置基础安全防护
-    "install_firewalld.sh"       # 6  安装防火墙服务
-    "install_fail2ban.sh"        # 7  安装自动封锁服务
-    "install_docker.sh"          # 8  安装Docker
-    "dockerhub_mirror.sh"        # 9  添加镜像地址
-    "deploy-containers.sh"       # 10 安装容器管理
-    "docker_backup_restore.sh"   # 11 备份与恢复
-    "service_checker.sh"         # 12 安装服务查询
+    "system_init.sh"                # 0  系统初始配置
+    "install_cockpit.sh"            # 1  安装面板Cockpit
+    "install_virtualization.sh"     # 2  安装虚拟机组件
+    "setup_cockpit_access.sh"       # 3  外网访问Cockpit
+    "remove_cockpit_access.sh"      # 4  删除外网访问配置
+    "email_config.sh"               # 5  设置发送邮件账户
+    "user_login_notify.sh"          # 6  用户登录发送通知
+    "cancel_user_login_notify.sh"   # 7  取消用户登录通知
+    "system_security.sh"            # 8  配置基础安全防护
+    "install_firewalld.sh"          # 9  安装防火墙服务
+    "install_fail2ban.sh"           # 10 安装自动封锁服务
+    "install_docker.sh"             # 11 安装Docker
+    "dockerhub_mirror.sh"           # 12 添加镜像地址
+    "deploy-containers.sh"          # 13 安装容器应用
+    "docker_backup_restore.sh"      # 14 备份与恢复
+    "service_checker.sh"            # 15 安装服务查询
 )
 
 # 创建目录
@@ -86,10 +89,10 @@ handle_main_menu() {
                         execute_script "$index" "${menu_lines[$index]}"
                     done
                     ;;
-                1|3|6)
+                1|6)
                     execute_script "${menu_actions[$choice]}" "${menu_lines[${menu_actions[$choice]}]}"
                     ;;
-                2|4|5)
+                2|3|4|5)
                     handle_submenu "$choice"
                     ;;
                 0)
@@ -152,6 +155,17 @@ submenu_2=$(cat <<-EOF
 1、安装面板Cockpit
 2、安装虚拟机组件
 3、外网访问Cockpit
+4、删除外网访问配置
+0、返回
+EOF
+)
+
+submenu_3=$(cat <<-EOF
+邮件通知服务
+--------------------------------------------------
+1、设置发送邮件账户
+2、用户登录发送通知
+3、取消用户登录通知
 0、返回
 EOF
 )
@@ -171,7 +185,7 @@ Docker服务
 --------------------------------------------------
 1、安装Docker
 2、添加镜像地址
-3、安装容器管理
+3、安装容器应用
 4、备份与恢复
 0、返回
 EOF
@@ -179,13 +193,13 @@ EOF
 
 # 菜单项及其对应的脚本索引
 declare -A menu_actions=(
-    [99]="0 1 2 3 4 5 6 7 8 9 10 12" # 一键配置HomeNAS（排除备份与恢复）
+    [99]="0 1 2 3 5 6 8 9 10 11 12 13 15" # 一键配置HomeNAS（排除备份与恢复）
     [1]="0"
     [2]="submenu_2"
-    [3]="4"
+    [3]="submenu_3"
     [4]="submenu_4"
     [5]="submenu_5"
-    [6]="12"
+    [6]="15"
 )
 
 # 菜单项及其显示名称
@@ -194,29 +208,34 @@ declare -A menu_lines=(
     [1]="安装面板Cockpit"
     [2]="安装虚拟机组件"
     [3]="外网访问Cockpit"
-    [4]="邮件通知服务"
-    [5]="配置基础安全防护"
-    [6]="安装防火墙服务"
-    [7]="安装自动封锁服务"
-    [8]="安装Docker"
-    [9]="添加镜像地址"
-    [10]="安装容器管理"
-    [11]="备份与恢复"
-    [12]="安装服务查询"
+    [4]="删除外网访问配置"
+    [5]="设置发送邮件账户"
+    [6]="用户登录发送通知"
+    [7]="取消用户登录通知"
+    [8]="配置基础安全防护"
+    [9]="安装防火墙服务"
+    [10]="安装自动封锁服务"
+    [11]="安装Docker"
+    [12]="添加镜像地址"
+    [13]="安装容器应用"
+    [14]="备份与恢复"
+    [15]="安装服务查询"
     [99]="一键配置HomeNAS"
 )
 
 declare -A submenus=(
     [submenu_2]="$submenu_2"
+    [submenu_3]="$submenu_3"
     [submenu_4]="$submenu_4"
     [submenu_5]="$submenu_5"
 )
 
 # 子菜单对应的脚本索引
 declare -A submenu_actions=(
-    [submenu_2]="1 2 3"
-    [submenu_4]="5 6 7"
-    [submenu_5]="8 9 10 11"
+    [submenu_2]="1 2 3 4"
+    [submenu_3]="5 6 7"
+    [submenu_4]="8 9 10"
+    [submenu_5]="11 12 13 14"
 )
 
 # 启动脚本并显示欢迎信息和温馨提示信息
