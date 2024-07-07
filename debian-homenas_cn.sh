@@ -15,8 +15,8 @@ SCRIPT_URLS=(
     "setup_cockpit_access.sh"       # 3  外网访问Cockpit
     "remove_cockpit_access.sh"      # 4  删除外网访问配置
     "email_config.sh"               # 5  设置发送邮件账户
-    "user_login_notify.sh"          # 6  用户登录发送通知
-    "cancel_user_login_notify.sh"   # 7  取消用户登录通知
+    "login_notify.sh"               # 6  用户登录发送通知
+    "cancel_login_notify.sh"        # 7  取消用户登录通知
     "system_security.sh"            # 8  配置基础安全防护
     "install_firewalld.sh"          # 9  安装防火墙服务
     "install_fail2ban.sh"           # 10 安装自动封锁服务
