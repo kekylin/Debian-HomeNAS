@@ -168,7 +168,7 @@ main() {
     while true; do
         echo "1) 备份Docker"
         echo "2) 恢复Docker"
-        echo "0) 退出"
+        echo "0) 返回"
         read -p "请选择操作：" opt
         case $opt in
             1)
@@ -193,7 +193,7 @@ main() {
                 fi
                 ;;
             0)
-                echo "退出程序。"
+                echo "返回。"
                 break
                 ;;
             *)
