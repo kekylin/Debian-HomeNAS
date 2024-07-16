@@ -1,23 +1,25 @@
 #!/bin/bash
 
-# 配置su限制
+# 1. 限制能su到root的用户
 function configure_su_restrictions {
-    local pam_file="/etc/pam.d/su"
-    if grep -q "pam_wheel.so" "$pam_file"; then
+    # 检查是否已经配置了对应的参数
+    if grep -q "sudo" /etc/pam.d/su; then
         echo "已配置su限制，跳过配置。"
     else
-        sed -i '1i auth required pam_wheel.so group=sudo' "$pam_file"
+        # 在文件首行插入内容
+        sed -i '1i auth required pam_wheel.so group=sudo' /etc/pam.d/su
         echo "已添加su限制配置。"
     fi
 }
 
-# 配置超时自动注销和记录用户操作日志
+# 2. 超时自动注销活动状态和记录所有用户的登录和操作日志
 function configure_timeout_and_logging {
-    local profile_file="/etc/profile"
-    if grep -q "TMOUT\|history" "$profile_file"; then
+    # 检查是否已经配置了对应的参数
+    if grep -q "TMOUT\|history" /etc/profile; then
         echo "已配置超时和命令记录日志，跳过配置。"
     else
-        cat << EOF >> "$profile_file"
+        # 追加内容到文件末尾
+        cat << EOF >> /etc/profile
 
 # 超时自动退出
 TMOUT=900
@@ -25,26 +27,27 @@ TMOUT=900
 export HISTTIMEFORMAT="%F %T "
 # 记录所有用户的登录和操作日志
 history
-USER=\$(whoami)
-USER_IP=\$(who -u am i 2>/dev/null| awk '{print \$NF}'|sed -e 's/[()]//g')
+USER=\`whoami\`
+USER_IP=\`who -u am i 2>/dev/null| awk '{print \$NF}'|sed -e 's/[()]//g'\`
 if [ "\$USER_IP" = "" ]; then
-    USER_IP=\$(hostname)
+USER_IP=\`hostname\`
 fi
 if [ ! -d /var/log/history ]; then
-    mkdir /var/log/history
-    chmod 777 /var/log/history
+mkdir /var/log/history
+chmod 777 /var/log/history
 fi
 if [ ! -d /var/log/history/\${LOGNAME} ]; then
-    mkdir /var/log/history/\${LOGNAME}
-    chmod 300 /var/log/history/\${LOGNAME}
+mkdir /var/log/history/\${LOGNAME}
+chmod 300 /var/log/history/\${LOGNAME}
 fi
 export HISTSIZE=4096
-DT=\$(date +"%Y%m%d_%H:%M:%S")
+DT=\`date +"%Y%m%d_%H:%M:%S"\`
 export HISTFILE="/var/log/history/\${LOGNAME}/\${USER}@\${USER_IP}_\$DT"
 chmod 600 /var/log/history/\${LOGNAME}/*history* 2>/dev/null
 EOF
         echo "已添加超时和命令记录日志。"
-        source "$profile_file"
+        # 加载配置使其生效
+        bash -c "source /etc/profile"
     fi
 }
 
