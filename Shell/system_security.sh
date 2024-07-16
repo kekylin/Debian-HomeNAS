@@ -28,17 +28,17 @@ export HISTTIMEFORMAT="%F %T "
 # 记录所有用户的登录和操作日志
 history
 USER=\`whoami\`
-USER_IP=\`who -u am i 2>/dev/null| awk '{print \$NF}'|sed -e 's/[()]//g'\`
+USER_IP=\`who -u am i 2>/dev/null | awk '{print \$NF}' | sed -e 's/[()]//g'\`
 if [ "\$USER_IP" = "" ]; then
-USER_IP=\`hostname\`
+    USER_IP=\`hostname\`
 fi
 if [ ! -d /var/log/history ]; then
-mkdir /var/log/history
-chmod 777 /var/log/history
+    mkdir /var/log/history
+    chmod 777 /var/log/history
 fi
 if [ ! -d /var/log/history/\${LOGNAME} ]; then
-mkdir /var/log/history/\${LOGNAME}
-chmod 300 /var/log/history/\${LOGNAME}
+    mkdir /var/log/history/\${LOGNAME}
+    chmod 300 /var/log/history/\${LOGNAME}
 fi
 export HISTSIZE=4096
 DT=\`date +"%Y%m%d_%H:%M:%S"\`
@@ -51,11 +51,11 @@ EOF
     fi
 }
 
-# 主函数
+# 主程序入口
 function main {
     configure_su_restrictions
     configure_timeout_and_logging
 }
 
-# 执行主函数
+# 调用主函数
 main
