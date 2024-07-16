@@ -55,9 +55,7 @@ EOF
 function main {
     configure_su_restrictions
     configure_timeout_and_logging
-    
-    # 添加成功标识到stderr，用于判断执行是否成功
-    echo "配置完成。" >&2
+    return 0
 }
 
 # 调用主函数
