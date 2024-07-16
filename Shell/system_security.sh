@@ -56,8 +56,8 @@ function main {
     configure_su_restrictions
     configure_timeout_and_logging
     
-    # 添加成功标识，用于判断执行是否成功
-    echo "配置完成。"
+    # 添加成功标识到stderr，用于判断执行是否成功
+    echo "配置完成。" >&2
 }
 
 # 调用主函数
