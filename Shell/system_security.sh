@@ -47,7 +47,7 @@ chmod 600 /var/log/history/\${LOGNAME}/*history* 2>/dev/null
 EOF
         echo "已添加超时和命令记录日志。"
         # 加载配置使其生效
-        bash -c "source /etc/profile"
+        source /etc/profile
     fi
 }
 
