@@ -2,15 +2,8 @@
 
 declare -r CONFIG_FILE="/etc/firewalld/zones/public.xml"
 
-# 读取用户输入
-read -p "是否安装防火墙Firewalld? (y/n): " choice
-
-if [[ "$choice" =~ ^[Yy]$ ]]; then
-    # 安装 firewalld
-    apt update -y && apt install firewalld -y
-else
-    echo "跳过安装防火墙Firewalld."
-fi
+# 安装 firewalld
+apt update -y && apt install firewalld -y
 
 # 停止 firewalld 服务
 systemctl stop firewalld
@@ -36,6 +29,3 @@ else
         sed -i '/<forward\/>/i \  <service name="cockpit"/>' "$CONFIG_FILE"
     fi
 fi
-
-# 启动 firewalld 服务
-systemctl start firewalld
