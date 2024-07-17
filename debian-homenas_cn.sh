@@ -2,7 +2,7 @@
 
 # 常量定义
 DEBIAN_HOMENAS_DIR="debian-homenas"
-URL_PREFIX="https://gitee.com/kekylin/Debian-HomeNAS/raw/test/Shell/"
+URL_PREFIX="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/"
 COLOR_RED="31"
 COLOR_GREEN="32"
 COLOR_BLUE="34"
