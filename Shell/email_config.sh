@@ -1,14 +1,5 @@
 #!/bin/bash
 
-# 询问用户是否需要配置邮件发送服务
-read -p "是否需要配置邮件发送服务？(y/n): " choice
-
-# 如果用户回答不是 y，则跳过配置邮件发送服务操作
-if [[ "$choice" != "y" ]]; then
-    echo "已跳过配置邮件发送服务。"
-    exit 0
-fi
-
 # 插入内容到 /etc/exim4/update-exim4.conf.conf 文件中
 cat <<EOF > /etc/exim4/update-exim4.conf.conf
 dc_eximconfig_configtype='satellite'
@@ -28,7 +19,7 @@ EOF
 
 # 询问用户输入QQ邮件账户及授权密码
 read -p "请输入QQ邮箱账户: " qq_account
-read -sp "请输入QQ邮箱授权密码: " qq_password
+read -sp "请输入QQ邮箱账户授权密码: " qq_password
 echo
 
 # 编辑 /etc/exim4/passwd.client 文件配置邮件发送账户
@@ -52,4 +43,4 @@ else
 fi
 
 # 提醒用户如果安装了防火墙，记得开放587端口
-echo "如果安装了防火墙，请确保已开放587端口。"
+echo "如有安装防火墙，请确保开放587端口。"
