@@ -49,6 +49,7 @@ if [[ $(check_and_start_service docker) == "active" ]]; then
 
     # 定义要检查的Docker容器名称及其访问地址
     declare -A docker_containers=(
+        ["ddns-go"]="http://$host_ip:9876"
         ["dockge"]="http://$host_ip:5001"
         ["nginx-ui"]="http://$host_ip:12800"
         ["portainer"]="https://$host_ip:9443"
