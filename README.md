@@ -2,9 +2,9 @@
 </h1>
   
 这是根据《基于Debian搭建HomeNAS》教程所写的半自动化配置脚本。
-# [搭建HomeNAS系列教程索引(点我打开)](https://docs.qq.com/doc/p/fa51c8a8545b12a5432df0efa9818d2939860ed0)
-# [脚本介绍(点我打开)](https://github.com/kekylin/Debian-HomeNAS/blob/main/%E8%84%9A%E6%9C%AC%E4%BB%8B%E7%BB%8D.md)
-# [成果展示(点我打开)](https://github.com/kekylin/Debian-HomeNAS/blob/main/%E6%88%90%E6%9E%9C%E5%B1%95%E7%A4%BA.md)
+#### [搭建HomeNAS系列教程索引(点我打开)](https://docs.qq.com/doc/p/fa51c8a8545b12a5432df0efa9818d2939860ed0)
+#### [脚本介绍(点我打开)](https://github.com/kekylin/Debian-HomeNAS/blob/main/%E8%84%9A%E6%9C%AC%E4%BB%8B%E7%BB%8D.md)
+#### [成果展示(点我打开)](https://github.com/kekylin/Debian-HomeNAS/blob/main/%E6%88%90%E6%9E%9C%E5%B1%95%E7%A4%BA.md)
 ---
 # 使用方法
 ### 1、首先使用SSH连接系统，然后用安装系统时创建的第一个普通用户账号进行登录。登陆后，使用以下命令切换到root账户。请注意，Debian系统默认禁用root账户直接通过SSH连接。
