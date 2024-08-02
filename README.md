@@ -1,4 +1,4 @@
-![debian-homenas](https://github.com/user-attachments/assets/fe07887d-2726-494a-ba3f-0097c30d24e4)
+![debian-homenas02](https://github.com/user-attachments/assets/7fa0122d-f985-4953-b62f-3866c698600d)
 
 这是根据《基于Debian搭建HomeNAS》教程所写的半自动化配置脚本。
 #### [搭建HomeNAS系列教程索引(点我打开)](https://docs.qq.com/doc/p/fa51c8a8545b12a5432df0efa9818d2939860ed0)
