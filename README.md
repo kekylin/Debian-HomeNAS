@@ -1,6 +1,13 @@
 ![debian-homenas02](https://github.com/user-attachments/assets/7fa0122d-f985-4953-b62f-3866c698600d)
 
-这是根据《基于Debian搭建HomeNAS》教程所写的半自动化配置脚本。
+一个将Debian系统快速配置成准NAS系统的脚本。可以轻松实现文件共享、照片备份、家庭影音、管理Docker、建立RAID等功能，使得Debian系统能够高效稳定地承担NAS任务。
+
+#### 主要特性
+- 开源
+- 安全
+- 稳定
+- 高效
+
 #### [搭建HomeNAS系列教程索引(点我打开)](https://docs.qq.com/doc/p/fa51c8a8545b12a5432df0efa9818d2939860ed0)
 #### [脚本介绍(点我打开)](https://github.com/kekylin/Debian-HomeNAS/blob/main/%E8%84%9A%E6%9C%AC%E4%BB%8B%E7%BB%8D.md)
 #### [成果展示(点我打开)](https://github.com/kekylin/Debian-HomeNAS/blob/main/%E6%88%90%E6%9E%9C%E5%B1%95%E7%A4%BA.md)
