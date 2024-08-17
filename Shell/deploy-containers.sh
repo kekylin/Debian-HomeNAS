@@ -8,6 +8,7 @@ COMPOSE_DIR="$WORK_DIR/docker-compose"
 declare -A containers=(
     [ddns-go]="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Docker%20Compose/ddns-go.yaml"
     [dockge]="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Docker%20Compose/dockge.yaml"
+    [dweebui]="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Docker%20Compose/dweebui.yaml"
     [nginx-ui]="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Docker%20Compose/nginx-ui.yaml"
     [portainer]="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Docker%20Compose/portainer.yaml"
     [portainer_zh-cn]="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Docker%20Compose/portainer_zh-cn.yaml"
