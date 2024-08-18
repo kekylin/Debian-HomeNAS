@@ -57,7 +57,7 @@ EOT
 
 # 复制并配置mail-whois.local
 cp /etc/fail2ban/action.d/mail-whois.{conf,local}
-cat <<EOT | tee /etc/fail2ban/action.d/mail-whois.local >/dev/null
+cat >/etc/fail2ban/action.d/mail-whois.local <<'EOT'
 [INCLUDES]
 before = mail-whois-common.conf
 
@@ -68,15 +68,15 @@ actionstop = printf %%b "你好！\n监视到【<name>】服务已被停止。\n
 actioncheck =
 actionban = printf %%b "警告!!!\n
             攻击者IP：<ip>\n
-            被攻击机器名：`uname -n` \n
-            被攻击机器IP：`/bin/curl ifconfig.co` \n
+            被攻击机器名：$(uname -n) \n
+            被攻击机器IP：$(/bin/curl -s ifconfig.co) \n
             攻击服务：<name> \n
             攻击次数：<failures> 次 \n
             攻击方法：暴力破解，尝试弱口令.\n
-            该IP：<ip>已经被Fail2Ban加入防火墙黑名单,屏蔽时间<bantime>秒.\n\n
+            该IP：<ip>已经被Fail2Ban加入防火墙黑名单,屏蔽时间<bantime>秒.\n
             以下是攻击者 <ip>信息 :\n
-            `/bin/curl https://api.vore.top/api/IPdata?ip=<ip>`\n\n
-            Fail2Ban邮件提醒\n\n "|/bin/mailx -s "<fq-hostname>服务器:<name>服务疑似遭到<ip>暴力攻击。" <dest>
+            $(/bin/curl -s https://api.vore.top/api/IPdata?ip=<ip>)\n
+            Fail2Ban邮件提醒\n "|/bin/mailx -s "<fq-hostname>服务器:<name>服务疑似遭到<ip>暴力攻击。" <dest>
 actionunban =
 [Init]
 name = default
