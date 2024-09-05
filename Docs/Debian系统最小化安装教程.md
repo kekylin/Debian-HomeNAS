@@ -1,4 +1,5 @@
 # Debian系统最小化安装教程
+系统安装视频演示流程：https://bilibili.com/video/BV1az42117pt/
 ## 1、Debian系统安装包下载
 ### 1.1 进入官网：https://www.debian.org ，点击其他下载链接
 ![image](https://github.com/user-attachments/assets/127b6543-c45e-42dc-a701-c1c88424427f)  
