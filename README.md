@@ -12,31 +12,33 @@
 
 ---
 #### [搭建HomeNAS系列教程索引](https://docs.qq.com/doc/p/fa51c8a8545b12a5432df0efa9818d2939860ed0)
-#### [脚本介绍](https://github.com/kekylin/Debian-HomeNAS/blob/main/%E8%84%9A%E6%9C%AC%E4%BB%8B%E7%BB%8D.md)
-#### [成果展示](https://github.com/kekylin/Debian-HomeNAS/blob/main/%E6%88%90%E6%9E%9C%E5%B1%95%E7%A4%BA.md)
+#### [脚本介绍](https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/%E8%84%9A%E6%9C%AC%E4%BB%8B%E7%BB%8D.md)
+#### [成果展示](https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/%E6%88%90%E6%9E%9C%E5%B1%95%E7%A4%BA.md)
 ---
 
 ## 使用方法
-### 1、连接系统
-Debian默认禁止root账户直接通过SSH连接，所以用安装系统时创建的第一个普通用户账号进行登录。
+### 1、安装系统
+安装教程：[Debian系统最小化安装教程](https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Debian%E7%B3%BB%E7%BB%9F%E6%9C%80%E5%B0%8F%E5%8C%96%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md)
+### 2、连接系统
+系统安装完成后，使用SSH工具连接上系统。  
+Debian默认禁止root账户直接通过SSH连接，所以用安装系统时创建的第一个普通用户账号进行登录。  
 登陆后，必须使用以下命令切换到root账户。
   ```shell
 su -
   ```
 
-### 2、运行脚本
-运行脚本命令（二选一）
-
-国内用户
+### 3、运行脚本
+运行脚本前，建议先阅读脚本介绍，了解脚本能做什么先，脚本中的选项可以按需执行。运行脚本命令（二选一）  
+**国内用户**
   ```shell
 bash <(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/main/debian-homenas_cn.sh)
   ```
-Github直连
+**Github直连**
   ```shell
 bash <(wget -qO- https://raw.githubusercontent.com/kekylin/debian-homenas/main/debian-homenas.sh)
   ```
 
-### 3、登陆使用
+### 4、登陆使用
 > **脚本执行完毕后，查看SSH工具显示的Cockpit面板管理地址和Docker管理工具地址，打开对应服务进行使用。**
 
 Cockpit  
@@ -52,4 +54,4 @@ https://localhost:9443
   ```
 
 ## 转载请保留出处
-- Debian-HomeNAS群：339169752
+- Debian-HomeNAS交流群：339169752
