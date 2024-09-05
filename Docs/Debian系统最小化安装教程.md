@@ -5,8 +5,10 @@
 ![image](https://github.com/user-attachments/assets/127b6543-c45e-42dc-a701-c1c88424427f)  
 ### 1.2 选择较庞大的完整安装映像，64 位 PC DVD-1 iso
 ![image](https://github.com/user-attachments/assets/d2f08c28-f606-4697-89f6-aa6f33a52172)  
-因Debian系统在安装过程中需要联网更新安全源，国内访问速度有时候异常缓慢，动则几个小时。故国内用户建议按上面教程下载完整系统镜像包，这样将避免此问题发生，完成系统安装只需要四分钟左右，大大提高系统安装效率。
-镜像写入工具推荐使用：https://etcher.balena.io/或https://rufus.ie/zh/  
+因Debian系统在安装过程中需要联网更新安全源，国内访问速度有时候异常缓慢，动则几个小时。故国内用户建议按上面教程下载完整系统镜像包，这样将避免此问题发生，完成系统安装只需要四分钟左右，大大提高系统安装效率。  
+镜像写入工具推荐使用：  
+Etcher https://github.com/balena-io/etcher/releases  
+Rufus https://rufus.ie/zh
 ## 2、选择安装方式（图形界面安装Graphical install）
 ![image](https://github.com/user-attachments/assets/4f1457db-b0e4-4e3b-a7cd-4e02513105e6)
 ## 3、设置系统默认语言（选英文，避免奇怪bug）
