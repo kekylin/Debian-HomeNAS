@@ -42,7 +42,7 @@ dmesg | grep -e DMAR -e IOMMU
 ip addr
 ```
 **4、找到名称为bridge0的接口查看IP地址，如下图所示。**
-![image](https://github.com/user-attachments/assets/daf1b0bf-b44c-4f66-a73e-aebdbd9b3c78)
+![image](https://github.com/user-attachments/assets/daf1b0bf-b44c-4f66-a73e-aebdbd9b3c78)  
 ## 2.2、开启IP包的转发功能
 **1、编辑 sysctl.conf 文件：**
 打开终端，并以 root 用户身份编辑 /etc/sysctl.conf 文件。
@@ -72,11 +72,11 @@ sysctl net.ipv4.ip_forward
 ## 三、创建群晖虚拟机
 ### 1、创建虚拟机，这里安装源必须先设置为Debian系统的镜像，如果没有，去Debian官网下载一个。地址：https://www.debian.org/
 ![image](https://github.com/user-attachments/assets/735b6115-7470-4802-ae64-dd44988d270f)  
-下载好的镜像文件上传到/mnt目录下。
+**下载好的镜像文件上传到/mnt目录下。**
 ![image](https://github.com/user-attachments/assets/9a239f62-e387-41d2-99ff-20669c401d1e)  
 硬件配置根据自己主机性能配置，丰俭由人。完成基础硬件配置后，点击创建并编辑。  
 这是创建好之后的界面，提醒一句，安装群晖系统，这里固件模式，必须是BIOS。  
-![image](https://github.com/user-attachments/assets/b0ddb3e8-3ed1-46e9-94f2-f34eb6c930c4)
+![image](https://github.com/user-attachments/assets/b0ddb3e8-3ed1-46e9-94f2-f34eb6c930c4)  
 ### 2、添加直通硬盘
 确定磁盘信息：  
 使用以下命令找到要直通的磁盘的信息：  
@@ -108,7 +108,7 @@ sudo systemctl restart libvirtd
 通过以上步骤，你应该能够将裸磁盘直通给虚拟机。请确保在进行此操作时备份重要数据，以免意外数据丢失。  
 ![image](https://github.com/user-attachments/assets/0d691788-dc9d-4a82-b34d-bb8bfeea6179)  
 Cockpit管理面板需要刷新一下页面才能呈现出来直通的硬盘。
-![image](https://github.com/user-attachments/assets/af0ade85-967c-4dd5-98a0-d7440ec7973d)
+![image](https://github.com/user-attachments/assets/af0ade85-967c-4dd5-98a0-d7440ec7973d)  
 ### 3、添加群晖引导
 找到磁盘——添加磁盘
 ![image](https://github.com/user-attachments/assets/eea4ef86-757a-489e-b51f-edfa344d610e)  
@@ -119,17 +119,17 @@ Cockpit管理面板需要刷新一下页面才能呈现出来直通的硬盘。
 缓存：default  
 总线：sata（必须是这个）  
 如果你不需要这个虚拟磁盘，可以现在删除掉。  
-![image](https://github.com/user-attachments/assets/4b030bee-6e16-4a0a-b6b3-6ecb9b2044bf)
-更改引导顺序，将群晖引导勾选上并调整至第一位。
+![image](https://github.com/user-attachments/assets/4b030bee-6e16-4a0a-b6b3-6ecb9b2044bf)  
+更改引导顺序，将群晖引导勾选上并调整至第一位。  
 ![image](https://github.com/user-attachments/assets/7ba3423b-7eac-4ca4-9504-ce84f1b47899)  
-点击安装，系统将开机
+点击安装，系统将开机  
 ![image](https://github.com/user-attachments/assets/eb139e96-7577-4a6d-9d5d-b06ebe4f4efb)  
-如果你点击安装之后，跑出来的是Debian系统的安装界面，请点击关机，然后将Debian系统的安装镜像移除，然后再开机安装群晖，如下图所示。
+如果你点击安装之后，跑出来的是Debian系统的安装界面，请点击关机，然后将Debian系统的安装镜像移除，然后再开机安装群晖，如下图所示。  
 ![image](https://github.com/user-attachments/assets/fb127564-62e4-444e-9f06-4abfe330dcbb)  
 删除Debian系统安装镜像  
 ![image](https://github.com/user-attachments/assets/1ddf3d17-1ce2-4c2d-9657-82bbde6fa91b)  
-确认删除
+确认删除  
 ![image](https://github.com/user-attachments/assets/bd1d160a-2eda-4035-b1aa-8f37b292407b)  
-如果你是直接进去RR引导界面，则后续步骤按常规安装群晖的教程走下去即可。
+如果你是直接进去RR引导界面，则后续步骤按常规安装群晖的教程走下去即可。  
 ![image](https://github.com/user-attachments/assets/a70d08e6-82b4-44cd-bd73-8124e5d92991)  
 ## 教程结束！
