@@ -50,16 +50,15 @@ Portainer
 https://localhost:9443
   ```
 
-<details><summary><h2>教程汇总</h2></summary>
+<details>
+  <summary><h2>教程汇总</h2></summary>
+   <h3>Debian系统相关教程</h3>
+     <a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Debian%E7%B3%BB%E7%BB%9F%E6%9C%80%E5%B0%8F%E5%8C%96%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md">Debian系统最小化安装教程</a><br>
+     <a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Debian%E7%B3%BB%E7%BB%9F%E9%80%9A%E8%BF%87Cockpit%E9%9D%A2%E6%9D%BF%E7%9B%B4%E9%80%9A%E7%A1%AC%E7%9B%98%E5%AE%89%E8%A3%85%E9%BB%91%E7%BE%A4%E6%99%96.md">Debian系统通过Cockpit面板直通硬盘安装黑群晖</a><br>
 
-<h3>Debian系统相关教程</h3>
-<a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Debian%E7%B3%BB%E7%BB%9F%E6%9C%80%E5%B0%8F%E5%8C%96%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md">Debian系统最小化安装教程</a><br>
-<a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Debian%E7%B3%BB%E7%BB%9F%E9%80%9A%E8%BF%87Cockpit%E9%9D%A2%E6%9D%BF%E7%9B%B4%E9%80%9A%E7%A1%AC%E7%9B%98%E5%AE%89%E8%A3%85%E9%BB%91%E7%BE%A4%E6%99%96.md">Debian系统通过Cockpit面板直通硬盘安装黑群晖</a><br>
-
-<h3>Docker相关教程</h3>
+  <h3>Docker相关教程</h3>
 
 </details>
-
 
 ---
 ## 转载请保留出处
