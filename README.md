@@ -68,11 +68,13 @@ https://localhost:9443
 <a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/%E8%84%9A%E6%9C%AC%E4%BB%8B%E7%BB%8D.md">脚本介绍（使用前阅读）</a><br>
 
 <h3>Debian系统相关教程</h3>
+<a href="https://docs.qq.com/doc/p/ac7a498302fca24ec7f0d002820ee32eceb03c13">基于Debian搭建HomeNAS图文教程</a><br>
 <a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Debian%E7%B3%BB%E7%BB%9F%E6%9C%80%E5%B0%8F%E5%8C%96%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md">Debian系统最小化安装教程</a><br>
 <a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Debian%E7%B3%BB%E7%BB%9F%E9%80%9A%E8%BF%87Cockpit%E9%9D%A2%E6%9D%BF%E7%9B%B4%E9%80%9A%E7%A1%AC%E7%9B%98%E5%AE%89%E8%A3%85%E9%BB%91%E7%BE%A4%E6%99%96.md">Debian系统通过Cockpit面板直通硬盘安装黑群晖</a><br>
 
+
 <h3>Docker相关教程</h3>
-待补充！
+<a href="https://docs.qq.com/doc/p/359de0f852ffbf9ba159dbec3ddcf119c33462f2">HomePage导航页部署教程</a><br>
 
 <h3>B站视频</h3>
 <a href="https://www.bilibili.com/video/BV16w4m1m78x">基于Linux搭建HomeNAS最终效果展示(Debian/Ubuntu)</a><br>
