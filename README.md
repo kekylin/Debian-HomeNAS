@@ -1,7 +1,7 @@
 <h1 align="center">基于Debian搭建HomeNAS<br />
 </h1>
 
-一个将Debian系统快速配置成准NAS系统的脚本。可以轻松实现文件共享、照片备份、家庭影音、管理Docker、建立RAID等功能，使得Debian系统能够高效稳定地承担NAS任务。
+一个将Debian系统快速配置成准NAS系统的脚本。可视化WebUI操作界面，可以轻松实现文件共享、照片备份、家庭影音、管理Docker、管理虚拟机、建立RAID等功能，使得Debian系统能够高效稳定地承担NAS任务。
 
 ## 主要特性
 - 开源
@@ -52,14 +52,47 @@ https://localhost:9443
 
 <details>
   <summary><h2>教程汇总</h2></summary>
-   <h3>Debian系统相关教程</h3>
-     <a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Debian%E7%B3%BB%E7%BB%9F%E6%9C%80%E5%B0%8F%E5%8C%96%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md">Debian系统最小化安装教程</a><br>
-     <a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Debian%E7%B3%BB%E7%BB%9F%E9%80%9A%E8%BF%87Cockpit%E9%9D%A2%E6%9D%BF%E7%9B%B4%E9%80%9A%E7%A1%AC%E7%9B%98%E5%AE%89%E8%A3%85%E9%BB%91%E7%BE%A4%E6%99%96.md">Debian系统通过Cockpit面板直通硬盘安装黑群晖</a><br>
+欢迎阅读本项目。在此，我想对本项目的内容做出以下免责声明：
+  
+<br>内容来源： 本项目的内容主要来源于互联网，以及我个人在学习和探索过程中的知识总结。我会尽可能保证内容的准确性和可靠性，但不对信息的完整性和及时性做出任何担保。
 
-  <h3>Docker相关教程</h3>
+<br>版权保护： 本项目的所有原创内容均采用 CC BY 4.0 许可协议。欢迎个人或非商业性使用者在遵守此协议的前提下引用或转载内容。转载时请注明出处并附上项目的链接。对于任何形式的商业使用或修改内容，须在遵守该许可协议的同时保留原作者信息并注明来源。
 
+<br>内容时效性： 鉴于技术和知识的发展迅速，本项目中的一些内容可能会随着时间的推移而失去实用性或准确性。我会尽力更新和修订内容，以保持其新鲜和准确，但无法对过时内容负责。
+
+<br>侵权联系： 我尊重他人的知识产权和版权，如果您认为本项目的内容侵犯了您的权益，请通过项目中提供的联系方式与我取得联系。一旦确认侵权行为，我将会立即采取措施删除相关内容或做出调整。
+
+<br>最后，希望您在阅读本项目时能够理解并遵守以上免责声明。感谢您的支持和理解！
+<h3>项目简介</h3>
+<a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/%E6%88%90%E6%9E%9C%E5%B1%95%E7%A4%BA.md">搭建成果展示</a><br>
+<a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/%E8%84%9A%E6%9C%AC%E4%BB%8B%E7%BB%8D.md">脚本介绍（使用前阅读）</a><br>
+
+<h3>Debian系统相关教程</h3>
+<a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Debian%E7%B3%BB%E7%BB%9F%E6%9C%80%E5%B0%8F%E5%8C%96%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md">Debian系统最小化安装教程</a><br>
+<a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Debian%E7%B3%BB%E7%BB%9F%E9%80%9A%E8%BF%87Cockpit%E9%9D%A2%E6%9D%BF%E7%9B%B4%E9%80%9A%E7%A1%AC%E7%9B%98%E5%AE%89%E8%A3%85%E9%BB%91%E7%BE%A4%E6%99%96.md">Debian系统通过Cockpit面板直通硬盘安装黑群晖</a><br>
+
+<h3>Docker相关教程</h3>
+待补充！
+
+<h3>B站视频</h3>
+<a href="https://www.bilibili.com/video/BV16w4m1m78x">基于Linux搭建HomeNAS最终效果展示(Debian/Ubuntu)</a><br>
+<a href="https://www.bilibili.com/video/BV1az42117pt">基于Debian搭建HomeNAS系列教程之系统安装篇</a><br>
+<a href="https://www.bilibili.com/video/BV1EU411d7PM">只需8分钟，快速将Debian系统配置成准NAS系统</a><br>
+<a href="https://www.bilibili.com/video/BV1vZ421H74n">一首歌的时间，在Debian系统直通硬盘安装黑群晖</a><br>
+<a href="https://www.bilibili.com/video/BV1apYXeyEHT">以可视化面板展示NAS服务外网访问来源_Nginx日志监控</a><br>
+  
 </details>
 
 ---
-## 转载请保留出处
-- Debian-HomeNAS交流群：339169752
+## Debian-HomeNAS交流群
+  ```shell
+339169752
+  ```
+## 支持与赞赏：
+如果觉得本项目对您有所帮助，欢迎通过赞赏来支持我的工作！您的支持将帮助我继续维护和更新项目，并带来更多优质内容。  
+赞赏完全是自愿的，不会对赞赏金额或频率施加任何要求，也不会以此为基础提供额外的服务或特权。  
+无论赞赏金额大小，您的支持我都十分感激！  
+![赞赏码](https://github.com/user-attachments/assets/0e79f8b6-fc8b-41d7-80b2-7bd8ce2f1dee)
+
+
+
