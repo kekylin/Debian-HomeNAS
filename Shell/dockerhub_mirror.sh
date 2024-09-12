@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Docker 镜像加速地址
-MIRRORS=("https://docker.1panel.live" "https://hub.iyuu.cn")
+MIRRORS=("https://docker.1panel.live" "https://docker.ketches.cn" "https://hub.iyuu.cn")
 DAEMON_JSON="/etc/docker/daemon.json"
 
 # 函数：将数组转换为 JSON 数组字符串
