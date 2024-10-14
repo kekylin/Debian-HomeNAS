@@ -25,7 +25,7 @@ SCRIPT_URLS=(
     "common/deploy-containers.sh"          # 13 安装容器应用
     "common/docker_backup_restore.sh"      # 14 备份与恢复
     "common/service_checker.sh"            # 15 安装服务查询
-    "ubuntu/setup_network_manager.sh"      # 16 设置NetworkManager管理网络
+    "ubuntu/setup_network_manager.sh"      # 16 设置Cockpit管理网络
 )
 
 # 创建目录
@@ -70,7 +70,7 @@ show_welcome() {
     color_print $COLOR_BLUE "=================================================="
     echo -e "                 Ubuntu HomeNAS\n\n                                  QQ群：339169752\n作者：kekylin\n项目：https://github.com/kekylin/Debian-HomeNAS"
     if [ "$first_run" = true ]; then
-        color_print $COLOR_GREEN "--------------------------------------------------\n温馨提示！\n1、系统安装后首次运行，建议执行“一键配置HomeNAS”。\n2、安装防火墙后重启一次系统再使用。\n3、菜单选项支持多选，空格分隔（如：1 3 5）。\n4、设置NetworkManager管理网络，网络连接会自动断开，且IP地址可能已改变，请查询确认。"
+        color_print $COLOR_GREEN "--------------------------------------------------\n温馨提示！\n1、系统安装后首次运行，建议执行“一键配置HomeNAS”。\n2、安装防火墙后重启一次系统再使用。\n3、菜单选项支持多选，空格分隔（如：1 3 5）。\n4、设置Cockpit管理网络，网络连接会自动断开，且IP地址可能已改变，请查询确认。"
         first_run=false  # 在首次运行后将其设置为 false
     fi
 }
@@ -156,7 +156,7 @@ submenu_2=$(cat <<-EOF
 2、安装虚拟机组件
 3、外网访问Cockpit
 4、删除外网访问配置
-5、设置NetworkManager管理网络
+5、设置Cockpit管理网络
 0、返回
 EOF
 )
@@ -221,7 +221,7 @@ declare -A menu_lines=(
     [13]="安装容器应用"
     [14]="备份与恢复"
     [15]="安装服务查询"
-    [16]="设置NetworkManager管理网络"
+    [16]="设置Cockpit管理网络"
     [99]="一键配置HomeNAS"
 )
 
