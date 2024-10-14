@@ -42,7 +42,7 @@ color_print() {
 execute_script() {
     local index="$1"
     local alias="$2"
-    wget -q --show-progress -O "${DEBIAN_HOMENAS_DIR}/${SCRIPT_URLS[$index]}" "${URL_PREFIX}${SCRIPT_URLS[$index]}" || {
+    wget -q --show-progress -O "${DEBIAN_HOMENAS_DIR}/${SCRIPT_URLS[$index]}" "${URL_PREFIX}/${SCRIPT_URLS[$index]}" || {
         color_print $COLOR_RED "下载 ${SCRIPT_URLS[$index]} 失败，请检查网络连接或稍后再试。"
         return 1
     }
