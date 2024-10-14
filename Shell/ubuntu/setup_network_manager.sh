@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# 确保脚本使用sudo执行
-if [[ $EUID -ne 0 ]]; then
-    echo "此脚本必须使用sudo权限运行。"
-    exit 1
-fi
-
 # 查找并确认/etc/netplan目录下存在.yaml配置文件
 netplan_file=$(find /etc/netplan/ -name "*.yaml" -print -quit)
 
@@ -16,7 +10,7 @@ fi
 
 # 检查是否已设置 renderer: NetworkManager
 if grep -q '^\s*renderer:\s*NetworkManager' "$netplan_file"; then
-    echo "已设置NetworkManager管理网络，跳过后续操作。"
+    echo "已设置Cockpit管理网络，跳过后续操作。"
     exit 0  # 跳过后面所有操作
 fi
 
@@ -30,7 +24,7 @@ chmod 600 "$netplan_file" || { echo "设置权限失败"; exit 1; }
 # 禁用 systemd-networkd 服务的开机自启
 systemctl is-enabled --quiet systemd-networkd && systemctl disable systemd-networkd
 
-echo "已设置NetworkManager管理网络，网络连接3秒后自动断开，IP地址可能已改变，请查询确认。"
+echo "已设置Cockpit管理网络，网络连接5秒后自动断开，IP地址可能已改变，请查询确认。"
 
 # NetworkManager配置文件路径
 nm_conf_file="/etc/NetworkManager/NetworkManager.conf"
