@@ -42,7 +42,8 @@ color_print() {
 execute_script() {
     local index="$1"
     local alias="$2"
-    wget -q --show-progress -O "${DEBIAN_HOMENAS_DIR}/${SCRIPT_URLS[$index]}" "${URL_PREFIX}/${SCRIPT_URLS[$index]}" || {
+    mkdir -p "$(dirname "${DEBIAN_HOMENAS_DIR}/${SCRIPT_URLS[$index]}")"  # 确保路径存在
+    wget -q --show-progress -O "${DEBIAN_HOMENAS_DIR}/${SCRIPT_URLS[$index]}" "${URL_PREFIX}${SCRIPT_URLS[$index]}" || {
         color_print $COLOR_RED "下载 ${SCRIPT_URLS[$index]} 失败，请检查网络连接或稍后再试。"
         return 1
     }
@@ -78,6 +79,7 @@ handle_main_menu() {
     first_run=true
     if [ "$first_run" = true ]; then
         clear
+        first_run=false
     fi
     while true; do
         show_welcome
@@ -105,7 +107,6 @@ handle_main_menu() {
                     ;;
             esac
         done
-        first_run=false
     done
 }
 
@@ -125,7 +126,7 @@ handle_submenu() {
                     return
                     ;;
                 *)
-                    if [[ $sub_choice =~ ^[1-4]$ ]] && [ "$sub_choice" -le "${#actions[@]}" ]; then
+                    if [[ $sub_choice =~ ^[1-5]$ ]] && [ "$sub_choice" -le "${#actions[@]}" ]; then
                         execute_script "${actions[$((sub_choice - 1))]}" "${submenu_lines[$((sub_choice - 1))]}"
                     else
                         color_print $COLOR_RED "\n无效选择：$sub_choice。请重新输入。\n"
@@ -240,5 +241,5 @@ declare -A submenu_actions=(
     [submenu_5]="11 12 13 14"
 )
 
-# 启动脚本并显示欢迎信息和温馨提示信息
+# 启动主菜单
 handle_main_menu
