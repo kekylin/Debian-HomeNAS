@@ -1,46 +1,31 @@
 #!/bin/bash
 
-# 1. 确保脚本以 root 或 sudo 用户执行
-if [[ $EUID -ne 0 ]] && ! groups $USER | grep -q "\bsudo\b"; then
-    echo "此脚本必须以 root 用户或 sudo 权限运行。"
-    exit 1
-fi
-
 # 常量定义
 DEBIAN_HOMENAS_DIR="debian-homenas"
-URL_PREFIX="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell"
+URL_PREFIX="https://gitee.com/kekylin/Debian-HomeNAS/raw/ubuntu/Shell/"
 COLOR_RED="31"
 COLOR_GREEN="32"
 COLOR_BLUE="34"
 
-# 定义脚本组（按目录分类）
-declare -A SCRIPT_GROUPS=(
-    [common]="
-        cancel_login_notify.sh        # c1  取消用户登录通知
-        deploy-containers.sh          # c2  安装容器应用
-        docker_backup_restore.sh      # c3  备份与恢复
-        dockerhub_mirror.sh           # c4  添加镜像地址
-        email_config.sh               # c5  设置发送邮件账户
-        install_fail2ban.sh           # c6  安装自动封锁服务
-        install_firewalld.sh          # c7  安装防火墙服务
-        install_virtualization.sh     # c8  安装虚拟机组件
-        login_notify.sh               # c9  用户登录发送通知
-        remove_cockpit_access.sh      # c10 删除外网访问配置
-        service_checker.sh            # c11 安装服务查询
-        setup_cockpit_access.sh       # c12 外网访问Cockpit
-        system_security.sh            # c13 配置基础安全防护
-    "
-    [debian]="
-        install_cockpit.sh            # d1  安装面板Cockpit
-        install_docker.sh             # d2  安装Docker
-        system_init.sh                # d3  系统初始配置
-    "
-    [ubuntu]="
-        install_cockpit.sh            # u1  安装面板Cockpit
-        install_docker.sh             # u2  安装Docker
-        setup_network_manager.sh      # u3  设置NetworkManager管理网络
-        system_init.sh                # u4  系统初始配置
-    "
+# 脚本文件列表
+SCRIPT_URLS=(
+    "ubuntu/system_init.sh"                # 0  系统初始配置
+    "ubuntu/install_cockpit.sh"            # 1  安装面板Cockpit
+    "common/install_virtualization.sh"     # 2  安装虚拟机组件
+    "common/setup_cockpit_access.sh"       # 3  外网访问Cockpit
+    "common/remove_cockpit_access.sh"      # 4  删除外网访问配置
+    "common/email_config.sh"               # 5  设置发送邮件账户
+    "common/login_notify.sh"               # 6  用户登录发送通知
+    "common/cancel_login_notify.sh"        # 7  取消用户登录通知
+    "common/system_security.sh"            # 8  配置基础安全防护
+    "common/install_firewalld.sh"          # 9  安装防火墙服务
+    "common/install_fail2ban.sh"           # 10 安装自动封锁服务
+    "ubuntu/install_docker.sh"             # 11 安装Docker
+    "common/dockerhub_mirror.sh"           # 12 添加镜像地址
+    "common/deploy-containers.sh"          # 13 安装容器应用
+    "common/docker_backup_restore.sh"      # 14 备份与恢复
+    "common/service_checker.sh"            # 15 安装服务查询
+    "ubuntu/setup_network_manager.sh"      # 16 设置NetworkManager管理网络
 )
 
 # 创建目录
@@ -55,21 +40,16 @@ color_print() {
 
 # 函数：下载并执行脚本
 execute_script() {
-    local group="$1"
-    local script="$2"
-    local alias="$3"
-    local script_url="${URL_PREFIX}/${group}/${script}"
-    
-    wget -q --show-progress -O "${DEBIAN_HOMENAS_DIR}/${script}" "${script_url}" || {
-        color_print $COLOR_RED "下载 ${script} 失败，请检查网络连接或稍后再试。"
+    local index="$1"
+    local alias="$2"
+    wget -q --show-progress -O "${DEBIAN_HOMENAS_DIR}/${SCRIPT_URLS[$index]}" "${URL_PREFIX}${SCRIPT_URLS[$index]}" || {
+        color_print $COLOR_RED "下载 ${SCRIPT_URLS[$index]} 失败，请检查网络连接或稍后再试。"
         return 1
     }
-    
     color_print $COLOR_BLUE "=================================================="
     color_print $COLOR_BLUE "正在执行 ${alias}..."
     color_print $COLOR_BLUE "=================================================="
-    
-    if bash "${DEBIAN_HOMENAS_DIR}/${script}"; then
+    if bash "${DEBIAN_HOMENAS_DIR}/${SCRIPT_URLS[$index]}"; then
         color_print $COLOR_GREEN "${alias} 执行完成。"
     else
         color_print $COLOR_RED "${alias} 执行失败。"
@@ -106,14 +86,12 @@ handle_main_menu() {
         for choice in "${choices[@]}"; do
             case "$choice" in
                 99)
-                    for group in "${!SCRIPT_GROUPS[@]}"; do
-                        for script in ${SCRIPT_GROUPS[$group]}; do
-                            execute_script "$group" "$script" "$script"
-                        done
+                    for index in ${menu_actions["99"]}; do
+                        execute_script "$index" "${menu_lines[$index]}"
                     done
                     ;;
                 1|6)
-                    execute_script "common" "${menu_actions[$choice]}" "${menu_lines[${menu_actions[$choice]}]}"
+                    execute_script "${menu_actions[$choice]}" "${menu_lines[${menu_actions[$choice]}]}"
                     ;;
                 2|3|4|5)
                     handle_submenu "$choice"
@@ -128,6 +106,33 @@ handle_main_menu() {
             esac
         done
         first_run=false
+    done
+}
+
+# 函数：子菜单处理
+handle_submenu() {
+    local submenu_choice="$1"
+    local submenu="submenu_$submenu_choice"
+    local actions=(${submenu_actions[$submenu]})
+    local submenu_lines=($(echo "${submenus[$submenu]}" | tail -n +3 | head -n -2 | awk '{print $2}'))
+
+    while true; do
+        show_menu "${submenus[$submenu]}"
+        read -r -a sub_choices
+        for sub_choice in "${sub_choices[@]}"; do
+            case "$sub_choice" in
+                0)
+                    return
+                    ;;
+                *)
+                    if [[ $sub_choice =~ ^[1-4]$ ]] && [ "$sub_choice" -le "${#actions[@]}" ]; then
+                        execute_script "${actions[$((sub_choice - 1))]}" "${submenu_lines[$((sub_choice - 1))]}"
+                    else
+                        color_print $COLOR_RED "\n无效选择：$sub_choice。请重新输入。\n"
+                    fi
+                    ;;
+            esac
+        done
     done
 }
 
@@ -152,6 +157,7 @@ submenu_2=$(cat <<-EOF
 2、安装虚拟机组件
 3、外网访问Cockpit
 4、删除外网访问配置
+5、设置NetworkManager管理网络
 0、返回
 EOF
 )
@@ -228,7 +234,7 @@ declare -A submenus=(
 
 # 子菜单对应的脚本索引
 declare -A submenu_actions=(
-    [submenu_2]="1 2 3 4"
+    [submenu_2]="1 2 3 4 16"
     [submenu_3]="5 6 7"
     [submenu_4]="8 9 10"
     [submenu_5]="11 12 13 14"
