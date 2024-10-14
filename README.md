@@ -46,7 +46,7 @@ bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/re
 **Ubuntu系统**  
 国内用户
   ```shell
-sudo bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/ubuntu/Shell/debian-homenas_cn.sh)"
+sudo bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/ubuntu/Shell/ubuntu-homenas_cn.sh)"
   ```
 Github直连
   ```shell
