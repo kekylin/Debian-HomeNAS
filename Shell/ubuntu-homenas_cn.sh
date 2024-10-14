@@ -223,6 +223,7 @@ declare -A menu_lines=(
     [13]="安装容器应用"
     [14]="备份与恢复"
     [15]="安装服务查询"
+    [16]="设置NetworkManager管理网络"
     [99]="一键配置HomeNAS"
 )
 
