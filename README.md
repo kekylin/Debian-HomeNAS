@@ -9,30 +9,47 @@
 - 稳定
 - 高效
 - 自由
+
 ---
 ### [搭建成果展示](https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/%E6%88%90%E6%9E%9C%E5%B1%95%E7%A4%BA.md)
 ---
+
+## 支持系统
+Debian 12  
+Ubuntu 24.04 LTS  
 
 ## 使用方法
 ### 1、安装系统
 安装教程：[Debian系统最小化安装教程](https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Debian%E7%B3%BB%E7%BB%9F%E6%9C%80%E5%B0%8F%E5%8C%96%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md)
 ### 2、连接系统
-系统安装完成后，使用SSH工具连接上系统。  
-Debian默认禁止root账户直接通过SSH连接，所以用安装系统时创建的第一个普通用户账号进行登录。  
-登陆后，必须使用以下命令切换到root账户。
+系统安装完成后，使用SSH工具连接上系统，输入下面运行脚本命令开启脚本。  
+> 注意：  
+> 1、Debian默认禁止root账户直接通过SSH连接，所以用安装系统时创建的第一个普通用户账号进行登录。  
+> 2、登陆后，必须使用以下命令切换到root账户运行脚本。  
+> 3、对于Ubuntu系统，不需先切换root账号，直接运行脚本命令即可。  
   ```shell
 su -
   ```
 
 ### 3、运行脚本
 运行脚本前，建议先阅读[脚本介绍](https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/%E8%84%9A%E6%9C%AC%E4%BB%8B%E7%BB%8D.md)，了解脚本能做什么先，脚本中的选项可以按需执行。运行脚本命令（二选一）  
-**国内用户**
+**Debian系统**
+国内用户
   ```shell
-bash <(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/main/debian-homenas_cn.sh)
+bash <(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/ubuntu/Shell/debian-homenas_cn.sh)
   ```
-**Github直连**
+Github直连
   ```shell
-bash <(wget -qO- https://raw.githubusercontent.com/kekylin/debian-homenas/main/debian-homenas.sh)
+bash <(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/ubuntu/Shell/debian-homenas.sh)
+  ```
+**Ubuntu系统**
+国内用户
+  ```shell
+sudo bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/ubuntu/Shell/debian-homenas_cn.sh)"
+  ```
+Github直连
+  ```shell
+sudo bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/ubuntu/Shell/ubuntu-homenas.sh)"
   ```
 
 ### 4、登陆使用
