@@ -1,36 +1,31 @@
 #!/bin/bash
 
-# 1. 确保脚本以 root 或 sudo 用户执行
-if [[ $EUID -ne 0 ]] && ! groups $USER | grep -q "\bsudo\b"; then
-    echo "此脚本必须以 root 用户或 sudo 权限运行。"
-    exit 1
-fi
-
 # 常量定义
 DEBIAN_HOMENAS_DIR="debian-homenas"
-URL_PREFIX="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/"
+URL_PREFIX="https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/ubuntu/Shell/"
 COLOR_RED="31"
 COLOR_GREEN="32"
 COLOR_BLUE="34"
 
 # 脚本文件列表
 SCRIPT_URLS=(
-    "system_init.sh"                # 0  系统初始配置
-    "install_cockpit.sh"            # 1  安装面板Cockpit
-    "install_virtualization.sh"     # 2  安装虚拟机组件
-    "setup_cockpit_access.sh"       # 3  外网访问Cockpit
-    "remove_cockpit_access.sh"      # 4  删除外网访问配置
-    "email_config.sh"               # 5  设置发送邮件账户
-    "login_notify.sh"               # 6  用户登录发送通知
-    "cancel_login_notify.sh"        # 7  取消用户登录通知
-    "system_security.sh"            # 8  配置基础安全防护
-    "install_firewalld.sh"          # 9  安装防火墙服务
-    "install_fail2ban.sh"           # 10 安装自动封锁服务
-    "install_docker.sh"             # 11 安装Docker
-    "dockerhub_mirror.sh"           # 12 添加镜像地址
-    "deploy-containers.sh"          # 13 安装容器应用
-    "docker_backup_restore.sh"      # 14 备份与恢复
-    "service_checker.sh"            # 15 安装服务查询
+    "ubuntu/system_init.sh"                # 0  系统初始配置
+    "ubuntu/install_cockpit.sh"            # 1  安装面板Cockpit
+    "common/install_virtualization.sh"     # 2  安装虚拟机组件
+    "common/setup_cockpit_access.sh"       # 3  外网访问Cockpit
+    "common/remove_cockpit_access.sh"      # 4  删除外网访问配置
+    "common/email_config.sh"               # 5  设置发送邮件账户
+    "common/login_notify.sh"               # 6  用户登录发送通知
+    "common/cancel_login_notify.sh"        # 7  取消用户登录通知
+    "common/system_security.sh"            # 8  配置基础安全防护
+    "common/install_firewalld.sh"          # 9  安装防火墙服务
+    "common/install_fail2ban.sh"           # 10 安装自动封锁服务
+    "ubuntu/install_docker.sh"             # 11 安装Docker
+    "common/dockerhub_mirror.sh"           # 12 添加镜像地址
+    "common/deploy-containers.sh"          # 13 安装容器应用
+    "common/docker_backup_restore.sh"      # 14 备份与恢复
+    "common/service_checker.sh"            # 15 安装服务查询
+    "ubuntu/setup_network_manager.sh"      # 16 设置NetworkManager管理网络
 )
 
 # 创建目录
@@ -47,6 +42,7 @@ color_print() {
 execute_script() {
     local index="$1"
     local alias="$2"
+    mkdir -p "$(dirname "${DEBIAN_HOMENAS_DIR}/${SCRIPT_URLS[$index]}")"  # 确保路径存在
     wget -q --show-progress -O "${DEBIAN_HOMENAS_DIR}/${SCRIPT_URLS[$index]}" "${URL_PREFIX}${SCRIPT_URLS[$index]}" || {
         color_print $COLOR_RED "下载 ${SCRIPT_URLS[$index]} 失败，请检查网络连接或稍后再试。"
         return 1
@@ -72,9 +68,9 @@ show_menu() {
 # 函数：显示欢迎信息
 show_welcome() {
     color_print $COLOR_BLUE "=================================================="
-    echo -e "                 Debian HomeNAS\n\n                                  QQ群：339169752\n作者：kekylin\n项目：https://github.com/kekylin/Debian-HomeNAS"
+    echo -e "                 Ubuntu HomeNAS\n\n                                  QQ群：339169752\n作者：kekylin\n项目：https://github.com/kekylin/Debian-HomeNAS"
     if [ "$first_run" = true ]; then
-        color_print $COLOR_GREEN "--------------------------------------------------\n温馨提示！\n1、系统安装后首次运行，建议执行“一键配置HomeNAS”。\n2、安装防火墙后重启一次系统再使用。\n3、菜单选项支持多选，空格分隔（如：1 3 5）。"
+        color_print $COLOR_GREEN "--------------------------------------------------\n温馨提示！\n1、系统安装后首次运行，建议执行“一键配置HomeNAS”。\n2、安装防火墙后重启一次系统再使用。\n3、菜单选项支持多选，空格分隔（如：1 3 5）。\n4、设置NetworkManager管理网络，网络连接会自动断开，且IP地址可能已改变，请查询确认。"
     fi
 }
 
@@ -83,6 +79,7 @@ handle_main_menu() {
     first_run=true
     if [ "$first_run" = true ]; then
         clear
+        first_run=false
     fi
     while true; do
         show_welcome
@@ -110,7 +107,6 @@ handle_main_menu() {
                     ;;
             esac
         done
-        first_run=false
     done
 }
 
@@ -130,7 +126,7 @@ handle_submenu() {
                     return
                     ;;
                 *)
-                    if [[ $sub_choice =~ ^[1-4]$ ]] && [ "$sub_choice" -le "${#actions[@]}" ]; then
+                    if [[ $sub_choice =~ ^[1-5]$ ]] && [ "$sub_choice" -le "${#actions[@]}" ]; then
                         execute_script "${actions[$((sub_choice - 1))]}" "${submenu_lines[$((sub_choice - 1))]}"
                     else
                         color_print $COLOR_RED "\n无效选择：$sub_choice。请重新输入。\n"
@@ -162,6 +158,7 @@ submenu_2=$(cat <<-EOF
 2、安装虚拟机组件
 3、外网访问Cockpit
 4、删除外网访问配置
+5、设置NetworkManager管理网络
 0、返回
 EOF
 )
@@ -238,11 +235,11 @@ declare -A submenus=(
 
 # 子菜单对应的脚本索引
 declare -A submenu_actions=(
-    [submenu_2]="1 2 3 4"
+    [submenu_2]="1 2 3 4 16"
     [submenu_3]="5 6 7"
     [submenu_4]="8 9 10"
     [submenu_5]="11 12 13 14"
 )
 
-# 启动脚本并显示欢迎信息和温馨提示信息
+# 启动主菜单
 handle_main_menu
