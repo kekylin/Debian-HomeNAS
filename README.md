@@ -37,11 +37,11 @@ su -
 **Debian系统**  
 国内用户
   ```shell
-bash <(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/ubuntu/Shell/debian-homenas_cn.sh)
+bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/ubuntu/Shell/debian-homenas_cn.sh)"
   ```
 Github直连
   ```shell
-bash <(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/ubuntu/Shell/debian-homenas.sh)
+bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/ubuntu/Shell/debian-homenas.sh)"
   ```
 **Ubuntu系统**  
 国内用户
