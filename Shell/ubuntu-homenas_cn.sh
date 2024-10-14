@@ -68,9 +68,9 @@ show_menu() {
 # 函数：显示欢迎信息
 show_welcome() {
     color_print $COLOR_BLUE "=================================================="
-    echo -e "                 Debian HomeNAS\n\n                                  QQ群：339169752\n作者：kekylin\n项目：https://github.com/kekylin/Debian-HomeNAS"
+    echo -e "                 Ubuntu HomeNAS\n\n                                  QQ群：339169752\n作者：kekylin\n项目：https://github.com/kekylin/Debian-HomeNAS"
     if [ "$first_run" = true ]; then
-        color_print $COLOR_GREEN "--------------------------------------------------\n温馨提示！\n1、系统安装后首次运行，建议执行“一键配置HomeNAS”。\n2、安装防火墙后重启一次系统再使用。\n3、菜单选项支持多选，空格分隔（如：1 3 5）。"
+        color_print $COLOR_GREEN "--------------------------------------------------\n温馨提示！\n1、系统安装后首次运行，建议执行“一键配置HomeNAS”。\n2、安装防火墙后重启一次系统再使用。\n3、菜单选项支持多选，空格分隔（如：1 3 5）。\n4、设置NetworkManager管理网络，网络连接会自动断开，且IP地址可能已改变，请查询确认。"
     fi
 }
 
