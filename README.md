@@ -37,20 +37,20 @@ su -
 **Debian系统**  
 国内用户
   ```shell
-bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/ubuntu/Shell/debian-homenas_cn.sh)"
+bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/test/Shell/debian-homenas.sh)"
   ```
 Github直连
   ```shell
-bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/ubuntu/Shell/debian-homenas.sh)"
+bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/test/Shell/debian-homenas.sh)"
   ```
 **Ubuntu系统**  
 国内用户
   ```shell
-sudo bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/ubuntu/Shell/ubuntu-homenas_cn.sh)"
+sudo bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/test/Shell/ubuntu-homenas.sh)"
   ```
 Github直连
   ```shell
-sudo bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/ubuntu/Shell/ubuntu-homenas.sh)"
+sudo bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/test/Shell/ubuntu-homenas.sh)"
   ```
 
 ### 4、登陆使用

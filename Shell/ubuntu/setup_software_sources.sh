@@ -20,6 +20,3 @@ EOF
 
 # 更新系统
 sudo apt update && sudo apt upgrade -y
-
-# 安装必备软件
-sudo apt install -y sudo curl git vim wget exim4 gnupg apt-transport-https ca-certificates smartmontools
