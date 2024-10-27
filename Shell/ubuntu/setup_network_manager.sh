@@ -10,7 +10,7 @@ fi
 
 # 检查是否已设置 renderer: NetworkManager
 if grep -q '^\s*renderer:\s*NetworkManager' "$netplan_file"; then
-    echo "已设置Cockpit管理网络，跳过后续操作。"
+    echo "已设置Cockpit管理网络，跳过操作。"
     exit 0  # 跳过后面所有操作
 fi
 
@@ -24,7 +24,7 @@ chmod 600 "$netplan_file" || { echo "设置权限失败"; exit 1; }
 # 禁用 systemd-networkd 服务的开机自启
 systemctl is-enabled --quiet systemd-networkd && systemctl disable systemd-networkd
 
-echo "已设置Cockpit管理网络，此页面连接已断开，且IP地址可能已改变，请查询确认。"
+echo "完成设置Cockpit管理网络，此页面连接已断开，且IP地址可能发生改变，请查询确认。"
 
 # NetworkManager配置文件路径
 nm_conf_file="/etc/NetworkManager/NetworkManager.conf"
