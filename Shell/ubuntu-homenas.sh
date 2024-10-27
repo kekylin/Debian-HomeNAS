@@ -166,7 +166,7 @@ display_submenu() {
 print_colored_text() {
     local texts=(
         "=================================================="
-        "                 Debian HomeNAS"
+        "                 Ubuntu HomeNAS"
         "                                  QQ群：339169752"
         "作者：kekylin"
         "项目：https://github.com/kekylin/Debian-HomeNAS"
