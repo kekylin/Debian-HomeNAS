@@ -37,20 +37,20 @@ su -
 **Debian系统**  
 国内用户
   ```shell
-bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/test/Shell/debian-homenas.sh)"
+bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/ubuntu/Shell/debian-homenas.sh)"
   ```
 Github直连
   ```shell
-bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/test/Shell/debian-homenas.sh)"
+bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/ubuntu/Shell/debian-homenas.sh)"
   ```
 **Ubuntu系统**  
 国内用户
   ```shell
-sudo bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/test/Shell/ubuntu-homenas.sh)"
+sudo bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/ubuntu/Shell/ubuntu-homenas.sh)"
   ```
 Github直连
   ```shell
-sudo bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/test/Shell/ubuntu-homenas.sh)"
+sudo bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/ubuntu/Shell/ubuntu-homenas.sh)"
   ```
 
 ### 4、登陆使用
@@ -109,9 +109,7 @@ https://localhost:9443
 339169752
   ```
 ## 支持与赞赏：
-如果觉得本项目对您有所帮助，欢迎通过赞赏来支持我的工作！您的支持将帮助我继续维护和更新项目，并带来更多优质内容。  
-赞赏完全是自愿的，不会对赞赏金额或频率施加任何要求，也不会以此为基础提供额外的服务或特权。  
-无论赞赏金额大小，您的支持我都十分感激！  
+如果觉得本项目对您有所帮助，欢迎通过赞赏来支持我的工作！  
 ![赞赏码](https://github.com/user-attachments/assets/0e79f8b6-fc8b-41d7-80b2-7bd8ce2f1dee)
 
 
