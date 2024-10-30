@@ -11,13 +11,13 @@ declare -A COLORS=(
 
 # 设置基础 URL
 BASE_URL_COMMON=(
-    "https://gitee.com/kekylin/Debian-HomeNAS/raw/ubuntu/Shell/common"
-    "https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/ubuntu/Shell/common"
+    "https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/common"
+    "https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/common"
 )
 
 BASE_URL_UBUNTU=(
-    "https://gitee.com/kekylin/Debian-HomeNAS/raw/ubuntu/Shell/ubuntu"
-    "https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/ubuntu/Shell/ubuntu"
+    "https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/ubuntu"
+    "https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/ubuntu"
 )
 
 # 定义主菜单顺序与分组
