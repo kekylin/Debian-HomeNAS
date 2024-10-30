@@ -16,8 +16,8 @@ BASE_URL_COMMON=(
 )
 
 BASE_URL_UBUNTU=(
-    "https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/ubuntu"
-    "https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/ubuntu"
+    "https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/debian"
+    "https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/debian"
 )
 
 # 定义主菜单顺序与分组
