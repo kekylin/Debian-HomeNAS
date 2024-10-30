@@ -15,7 +15,7 @@ BASE_URL_COMMON=(
     "https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/common"
 )
 
-BASE_URL_UBUNTU=(
+BASE_URL_DEBIAN=(
     "https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/debian"
     "https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/debian"
 )
@@ -73,7 +73,7 @@ run_script() {
     if [[ $key == c* ]]; then
         base_urls=("${BASE_URL_COMMON[@]}")
     elif [[ $key == u* ]]; then
-        base_urls=("${BASE_URL_UBUNTU[@]}")
+        base_urls=("${BASE_URL_DEBIAN[@]}")
     fi
 
     local script_path="/tmp/$(basename "$script_name")"
