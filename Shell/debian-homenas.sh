@@ -37,8 +37,8 @@ declare -A SUBMENU_ITEMS=(
     ["系统管理面板"]="u2 c2 c3 c4"
     ["邮件通知服务"]="c5 c6 c7"
     ["系统安全防护"]="c8 c9 c10"
-    ["Docker服务"]="u3 c11 c12 c13"
-    ["安装服务查询"]="c14"
+    ["Docker服务"]="c11 c12 c13 c14"
+    ["安装服务查询"]="c15"
     ["一键配置HomeNAS"]="基础版 安全版"
 )
 
@@ -54,13 +54,13 @@ declare -A SCRIPT_INFO=(
     ["c8"]="system_security.sh #配置基础安全防护"
     ["c9"]="install_firewalld.sh #安装防火墙服务"
     ["c10"]="install_fail2ban.sh #安装自动封锁服务"
-    ["c11"]="dockerhub_mirror.sh #添加镜像地址"
-    ["c12"]="deploy-containers.sh #安装容器应用"
-    ["c13"]="docker_backup_restore.sh #备份与恢复"
-    ["c14"]="service_checker.sh #安装服务查询"
+    ["c11"]="install_docker.sh #安装Docker"
+    ["c12"]="dockerhub_mirror.sh #添加镜像地址"
+    ["c13"]="deploy-containers.sh #安装容器应用"
+    ["c14"]="docker_backup_restore.sh #备份与恢复"
+    ["c15"]="service_checker.sh #安装服务查询"
     ["u1"]="setup_software_sources.sh #配置软件源"
     ["u2"]="install_cockpit.sh #安装面板Cockpit"
-    ["u3"]="install_docker.sh #安装Docker"
 )
 
 # 下载并执行脚本
@@ -107,8 +107,8 @@ run_homenas_config() {
 
     # 定义每个版本对应的脚本
     declare -A VERSION_SCRIPTS=(
-        ["基础版"]="u1 c1 u2 u3 c11 c12 c14"
-        ["安全版"]="u1 c1 u2 c5 c6 c8 c9 c10 u3 c11 c12 c14"
+        ["基础版"]="u1 c1 u2 c11 c12 c13 c15"
+        ["安全版"]="u1 c1 u2 c5 c6 c8 c9 c10 c11 c12 c13 c15"
     )
 
     # 参数检查：确保版本字符串有效
