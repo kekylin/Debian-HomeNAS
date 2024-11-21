@@ -8,7 +8,7 @@ apt update
 os_codename=$(awk -F= '/VERSION_CODENAME/{print $2}' /etc/os-release)
 
 # 安装Cockpit及其附属组件（Navigator、File Sharing、Identities组件）
-apt install -y -t "$os_codename-backports" cockpit cockpit-pcp
+apt install -y -t "$os_codename-backports" cockpit pcp python3-pcp
 apt install -y cockpit-navigator cockpit-file-sharing cockpit-identities
 
 # 配置首页展示信息
