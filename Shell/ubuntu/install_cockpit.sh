@@ -8,7 +8,7 @@ sudo apt update
 os_codename=$(awk -F= '/VERSION_CODENAME/{print $2}' /etc/os-release)
 
 # 安装Cockpit及其附属组件（Navigator、File Sharing、Identities组件）
-sudo apt install -y -t "$os_codename-backports" cockpit cockpit-pcp
+sudo apt install -y -t "$os_codename-backports" cockpit pcp python3-pcp
 sudo apt install -y cockpit-navigator cockpit-file-sharing cockpit-identities
 # 安装Tuned系统调优工具
 sudo apt install -y tuned
