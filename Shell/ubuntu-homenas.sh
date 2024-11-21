@@ -33,35 +33,41 @@ MAIN_MENU_ORDER=(
 
 # 定义子菜单项及其对应脚本
 declare -A SUBMENU_ITEMS=(
-    ["系统初始配置"]="u1 c1"
-    ["系统管理面板"]="u2 c2 c3 c4 u3"
-    ["邮件通知服务"]="c5 c6 c7"
-    ["系统安全防护"]="c8 c9 c10"
-    ["Docker服务"]="c11 c12 c13 c14"
-    ["安装服务查询"]="c15"
+    ["系统初始配置"]="c11 c12"
+    ["系统管理面板"]="u1 c21 c22 c23 u2"
+    ["邮件通知服务"]="c31 c32 c33"
+    ["系统安全防护"]="c41 c42 c43"
+    ["Docker服务"]="c51 c52 c53 c54"
+    ["安装服务查询"]="c61"
     ["一键配置HomeNAS"]="基础版 安全版"
 )
 
 # 定义脚本信息
 declare -A SCRIPT_INFO=(
-    ["c1"]="install_required_software.sh #安装必备软件"
-    ["c2"]="install_virtualization.sh #安装虚拟机组件"
-    ["c3"]="setup_cockpit_access.sh #外网访问Cockpit"
-    ["c4"]="remove_cockpit_access.sh #删除外网访问配置"
-    ["c5"]="email_config.sh #设置发送邮件账户"
-    ["c6"]="login_notify.sh #用户登录发送通知"
-    ["c7"]="cancel_login_notify.sh #取消用户登录通知"
-    ["c8"]="system_security.sh #配置基础安全防护"
-    ["c9"]="install_firewalld.sh #安装防火墙服务"
-    ["c10"]="install_fail2ban.sh #安装自动封锁服务"
-    ["c11"]="install_docker.sh #安装Docker"
-    ["c12"]="dockerhub_mirror.sh #添加镜像地址"
-    ["c13"]="deploy-containers.sh #安装容器应用"
-    ["c14"]="docker_backup_restore.sh #备份与恢复"
-    ["c15"]="service_checker.sh #安装服务查询"
-    ["u1"]="setup_software_sources.sh #配置软件源"
-    ["u2"]="install_cockpit.sh #安装面板Cockpit"
-    ["u3"]="setup_network_manager.sh #设置Cockpit管理网络"
+    ["c11"]="change_sources.sh #配置软件源"
+    ["c12"]="install_required_software.sh #安装必备软件"
+
+    ["c21"]="install_virtualization.sh #安装虚拟机组件"
+    ["c22"]="setup_cockpit_access.sh #外网访问Cockpit"
+    ["c23"]="remove_cockpit_access.sh #删除外网访问配置"
+
+    ["c31"]="email_config.sh #设置发送邮件账户"
+    ["c32"]="login_notify.sh #用户登录发送通知"
+    ["c33"]="cancel_login_notify.sh #取消用户登录通知"
+
+    ["c41"]="system_security.sh #配置基础安全防护"
+    ["c42"]="install_firewalld.sh #安装防火墙服务"
+    ["c43"]="install_fail2ban.sh #安装自动封锁服务"
+
+    ["c51"]="install_docker.sh #安装Docker"
+    ["c52"]="dockerhub_mirror.sh #添加镜像地址"
+    ["c53"]="deploy-containers.sh #安装容器应用"
+    ["c54"]="docker_backup_restore.sh #备份与恢复"
+
+    ["c61"]="service_checker.sh #安装服务查询"
+
+    ["u1"]="install_cockpit.sh #安装面板Cockpit"
+    ["u2"]="setup_network_manager.sh #设置Cockpit管理网络"
 )
 
 # 下载并执行脚本
@@ -108,8 +114,8 @@ run_homenas_config() {
 
     # 定义每个版本对应的脚本
     declare -A VERSION_SCRIPTS=(
-        ["基础版"]="u1 c1 u2 c11 c12 c13 c15"
-        ["安全版"]="u1 c1 u2 c5 c6 c8 c9 c10 c11 c12 c13 c15"
+        ["基础版"]="c11 c12 u1 c51 c52 c53 c61"
+        ["安全版"]="c11 c12 u1 c31 c32 c41 c42 c43 c51 c52 c53 c61"
     )
 
     # 参数检查：确保版本字符串有效
