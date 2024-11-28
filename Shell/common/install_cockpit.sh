@@ -67,7 +67,7 @@ EOF
 # 配置Cockpit登录界面公告
 issue_file="/etc/cockpit/issue.cockpit"
 if [[ ! -f "$issue_file" ]]; then
-    echo "DIY Home NAS Service!" > "$issue_file"
+    echo "DIY Home NAS Service" > "$issue_file"
 fi
 
 # 重启cockpit服务
