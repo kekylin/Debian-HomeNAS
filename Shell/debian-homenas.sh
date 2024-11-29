@@ -101,7 +101,7 @@ get_script_urls() {
     if [[ $key == c* ]]; then
         subdir="common"  # c开头的脚本属于common目录
     elif [[ $key == u* ]]; then
-        subdir="debian"  # u开头的脚本属于ubuntu目录
+        subdir="debian"  # u开头的脚本属于debian目录
     else
         subdir="common"  # 其他情况默认为common目录
     fi
