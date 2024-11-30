@@ -13,13 +13,13 @@ cat <<EOT | tee /etc/fail2ban/jail.local >/dev/null
 ignoreip = 127.0.0.1/8 ::1
 
 #此参数设置禁令的长度，以秒为单位。默认值为-1，表示将永久禁止IP地址，设置值为1h，则禁止1小时。
-bantime  = -1
+bantime  = 1h
 
 #此参数设置 Fail2ban 在查找重复失败的身份验证尝试时将关注的窗口。默认设置为 1d ，这意味着软件将统计最近 1 天内的失败尝试次数。
 findtime  = 1d
 
 #这设置了在禁止之前在窗口内允许的失败尝试次数。
-maxretry = 3
+maxretry = 5
 
 #此条目指定 Fail2ban 将如何监视日志文件。设置auto意味着 fail2ban 将尝试pyinotify, 然后gamin, 然后基于可用的轮询算法。inotify是一个内置的 Linux 内核功能，用于跟踪文件何时被访问，并且是Fail2ban 使用pyinotify的 Python 接口。
 #backend = auto
