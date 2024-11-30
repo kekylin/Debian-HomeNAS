@@ -80,7 +80,7 @@ download_script() {
             fi
         done
         if [ $i -lt $retry ]; then
-            log_message "WARNING" "下载失败，积极重试中..." "${COLORS[YELLOW]}"
+            log_message "WARNING" "所有地址下载失败，重新尝试中..." "${COLORS[YELLOW]}"
             sleep 1
         fi
     done
