@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 定义常量
-WORK_DIR="homenas"
+WORK_DIR="/tmp"
 COMPOSE_DIR="$WORK_DIR/docker-compose"
 
 # 容器配置，格式为 容器名称=下载地址
