@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # 定义镜像源基础URL
-MIRROR_BASE="https://mirrors.bfsu.edu.cn"
+MIRROR_BASE="https://mirrors.tuna.tsinghua.edu.cn"
 
 # 使用 ANSI 颜色代码定义颜色
 declare -A COLORS=(
