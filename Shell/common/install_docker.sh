@@ -29,7 +29,7 @@ OS_NAME=$(echo "$NAME" | tr '[:upper:]' '[:lower:]')
 VERSION_CODENAME=$(echo "$VERSION_CODENAME")
 
 # 定义基础镜像源URL
-BASE_MIRROR="https://mirrors.bfsu.edu.cn"
+BASE_MIRROR="https://mirrors.tuna.tsinghua.edu.cn"
 
 # 定义镜像源地址函数
 get_docker_mirror() {
