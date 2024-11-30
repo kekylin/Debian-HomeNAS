@@ -78,11 +78,11 @@ display_firewalld_fail2ban_info() {
     local fail2ban_installed=$(is_package_installed fail2ban && echo "yes" || echo "no")
 
     if [[ "$firewalld_installed" == "yes" ]]; then
-        log_message "INFO" "Firewalld防火墙服务已安装，使用时注意放行必要端口。" "${COLORS[CYAN]}"
+        log_message "INFO" "Firewalld防火墙服务已安装，注意放行必要端口。" "${COLORS[CYAN]}"
         echo ""
     fi
     if [[ "$fail2ban_installed" == "yes" ]]; then
-        log_message "INFO" "Fail2ban自动封锁服务已安装，5次登陆系统失败，访问者IP将被封禁1小时。" "${COLORS[CYAN]}"
+        log_message "INFO" "Fail2ban服务已安装，登陆系统失败5次，访问IP封禁1小时。" "${COLORS[CYAN]}"
         echo ""
     fi
 }
