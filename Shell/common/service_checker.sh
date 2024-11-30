@@ -32,7 +32,8 @@ is_service_active() {
 
 # 打印服务状态和访问信息
 print_service_status() {
-    log_message "SUCCESS" "$1 服务已运行！" "${COLORS[GREEN]}"
+echo -e "${COLORS[CYAN]}--------------------------------------------------${COLORS[RESET]}"
+log_message "SUCCESS" "$1 服务已运行！" "${COLORS[GREEN]}"
     log_message "INFO" "请通过浏览器访问 $2" "${COLORS[CYAN]}"
     echo ""  # 添加空行
 }
@@ -40,7 +41,6 @@ print_service_status() {
 # 检查系统服务模块
 check_system_services() {
     local host_ip="$1"
-
     # 检查cockpit服务
     if is_service_active cockpit; then
         print_service_status "cockpit" "https://${host_ip}:9090"
