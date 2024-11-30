@@ -51,7 +51,6 @@ if [[ $(check_and_start_service docker) == "active" ]]; then
     declare -A docker_containers=(
         ["ddns-go"]="http://$host_ip:9876"
         ["dockge"]="http://$host_ip:5001"
-        ["dweebui"]="http://$host_ip:8000"
         ["nginx-ui"]="http://$host_ip:12800"
         ["portainer"]="https://$host_ip:9443"
         ["portainer_zh-cn"]="http://$host_ip:9999"
