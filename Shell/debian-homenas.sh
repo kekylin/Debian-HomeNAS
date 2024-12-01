@@ -49,7 +49,8 @@ declare -A SCRIPT_INFO=(
     ["c53"]="deploy-containers.sh #安装容器应用"
     ["c54"]="docker_backup_restore.sh #备份与恢复"
 
-    ["c61"]="service_checker.sh #安装服务查询"
+    ["c61"]="install_tailscale.sh #内网穿透服务"
+    ["c62"]="service_checker.sh #安装服务查询"
     
     ["u1"]="setup_network_manager.sh #设置Cockpit管理网络"
 )
@@ -61,7 +62,7 @@ MAIN_MENU_ORDER=(
     "邮件通知服务"
     "系统安全防护"
     "Docker服务"
-    "安装服务查询"
+    "综合应用服务"
     "一键配置HomeNAS"
 )
 
@@ -72,14 +73,14 @@ declare -A SUBMENU_ITEMS=(
     ["邮件通知服务"]="c31 c32 c33"
     ["系统安全防护"]="c41 c42 c43"
     ["Docker服务"]="c51 c52 c53 c54"
-    ["安装服务查询"]="c61"
+    ["综合应用服务"]="c61 c62"
     ["一键配置HomeNAS"]="basic secure"
 )
 
 # 一键配置HomeNAS的版本与脚本对应关系
 declare -A HOME_NAS_VERSIONS=(
-    ["basic"]="c11 c12 c21 c51 c52 c53 c61"
-    ["secure"]="c11 c12 c21 c31 c32 c41 c42 c43 c51 c52 c53 c61"
+    ["basic"]="c11 c12 c21 c51 c52 c53 c62"
+    ["secure"]="c11 c12 c21 c31 c32 c41 c42 c43 c51 c52 c53 c62"
 )
 
 # 获取脚本中文名称，下载脚本、执行脚本提示语使用
