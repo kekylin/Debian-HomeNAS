@@ -22,8 +22,8 @@ log_message() {
 
 # 基础URL列表
 BASE_URLS=(
-    "https://gitee.com/kekylin/Debian-HomeNAS/raw/test/Shell/"
-    "https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/test/Shell/"
+    "https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/"
+    "https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/"
 )
 
 # 脚本信息
