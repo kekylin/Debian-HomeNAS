@@ -34,23 +34,13 @@ su -
 ### 3、运行脚本
 运行脚本前，建议先阅读[脚本介绍](https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/%E8%84%9A%E6%9C%AC%E4%BB%8B%E7%BB%8D.md)，了解脚本能做什么先，脚本中的选项可以按需执行。运行脚本命令（二选一）  
 
-**Debian系统**  
 国内用户
   ```shell
-bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/debian-homenas.sh)"
+SUDO=$(command -v sudo || echo "") ; $SUDO bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/test/Shell/start.sh)"
   ```
 Github直连
   ```shell
-bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/debian-homenas.sh)"
-  ```
-**Ubuntu系统**  
-国内用户
-  ```shell
-sudo bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/ubuntu-homenas.sh)"
-  ```
-Github直连
-  ```shell
-sudo bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/ubuntu-homenas.sh)"
+SUDO=$(command -v sudo || echo "") ; $SUDO bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/test/Shell/start.sh)"
   ```
 
 ### 4、登陆使用

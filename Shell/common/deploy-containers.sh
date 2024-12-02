@@ -1,14 +1,13 @@
 #!/bin/bash
 
 # 定义常量
-WORK_DIR="homenas"
+WORK_DIR="/tmp"
 COMPOSE_DIR="$WORK_DIR/docker-compose"
 
 # 容器配置，格式为 容器名称=下载地址
 declare -A containers=(
     [ddns-go]="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Docker%20Compose/ddns-go.yaml"
     [dockge]="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Docker%20Compose/dockge.yaml"
-    [dweebui]="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Docker%20Compose/dweebui.yaml"
     [nginx-ui]="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Docker%20Compose/nginx-ui.yaml"
     [portainer]="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Docker%20Compose/portainer.yaml"
     [portainer_zh-cn]="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Docker%20Compose/portainer_zh-cn.yaml"

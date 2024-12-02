@@ -1,7 +1,31 @@
 #!/bin/bash
 
+# 定义ANSI颜色代码
+declare -A COLORS=(
+    [RED]='\033[0;31m'
+    [GREEN]='\033[0;32m'
+    [YELLOW]='\033[0;33m'
+    [BLUE]='\033[0;34m'
+    [PURPLE]='\033[0;35m'
+    [CYAN]='\033[0;36m'
+    [WHITE]='\033[1;37m'
+    [RESET]='\033[0m'
+)
+
+# 定义日志输出函数
+log_message() {
+    local msg_type="$1"
+    local msg="$2"
+    local color="${3:-${COLORS[RESET]}}"  # 默认颜色为重置
+    echo -e "${color}[${msg_type}] ${msg}${COLORS[RESET]}"
+}
+
 # Docker 镜像加速地址
-MIRRORS=("https://docker.1panel.live" "https://docker.ketches.cn" "https://hub.iyuu.cn")
+MIRRORS=(
+    "https://docker.1panel.live"
+    "https://docker.ketches.cn"
+    "https://hub.iyuu.cn"
+)
 DAEMON_JSON="/etc/docker/daemon.json"
 
 # 函数：将数组转换为 JSON 数组字符串
@@ -28,6 +52,8 @@ update_registry_mirrors() {
         while IFS= read -r line; do
             existing_mirrors+=("${line//\"/}")
         done < <(grep -oP '"https?://[^"]+"' "$DAEMON_JSON")
+    else
+        log_message "WARNING" "配置文件 $DAEMON_JSON 不存在，将创建新文件。" "${COLORS[YELLOW]}"
     fi
 
     # 添加新镜像地址，避免重复
@@ -40,18 +66,21 @@ update_registry_mirrors() {
     updated_mirrors_json=$(array_to_json_array "${existing_mirrors[@]}")
 
     # 更新配置文件
+    log_message "INFO" "更新daemon.json配置文件..." "${COLORS[CYAN]}"
     echo -e "{\n  \"registry-mirrors\": $updated_mirrors_json\n}" > "$DAEMON_JSON"
 }
 
-# 函数：后台重载和重启 Docker
+# 函数：重启 Docker 服务
 reload_and_restart_docker() {
-    (
-        systemctl daemon-reload
-        systemctl restart docker
-    ) &>/dev/null &
+    log_message "INFO" "重启 Docker 服务..." "${COLORS[CYAN]}"
+    systemctl daemon-reload
+    if ! systemctl restart docker; then
+        log_message "ERROR" "重启 Docker 服务失败。" "${COLORS[RED]}"
+        exit 1
+    fi
 }
 
 # 主逻辑
 update_registry_mirrors "${MIRRORS[@]}"
 reload_and_restart_docker
-echo "Docker镜像加速地址配置已完成。"
+log_message "SUCCESS" "Docker镜像加速地址配置已完成。" "${COLORS[GREEN]}"
