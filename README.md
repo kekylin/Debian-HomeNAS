@@ -36,11 +36,11 @@ su -
 
 国内用户
   ```shell
-SUDO=$(command -v sudo || echo "") ; $SUDO bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/test/Shell/start.sh)"
+SUDO=$(command -v sudo || echo "") ; $SUDO bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/start.sh)"
   ```
 Github直连
   ```shell
-SUDO=$(command -v sudo || echo "") ; $SUDO bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/test/Shell/start.sh)"
+SUDO=$(command -v sudo || echo "") ; $SUDO bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/start.sh)"
   ```
 
 ### 4、登陆使用
@@ -59,7 +59,7 @@ https://localhost:9443
   ```
 
 <details>
-  <summary><h2>教程汇总</h2></summary>
+  <summary><h2>教程汇总(点我展开)</h2></summary>
 欢迎阅读本项目。在此，我想对本项目的内容做出以下免责声明：
   
 <br>内容来源： 本项目的内容主要来源于互联网，以及我个人在学习和探索过程中的知识总结。我会尽可能保证内容的准确性和可靠性，但不对信息的完整性和及时性做出任何担保。
@@ -80,7 +80,7 @@ https://localhost:9443
 <a href="https://docs.qq.com/doc/p/7859e20c9c3fa6816cb9f4d4e5e02a67495fc4a6">基于Ubuntu搭建HomeNAS图文教程 （本项目核心教程）</a><br>
 <a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Debian%E7%B3%BB%E7%BB%9F%E6%9C%80%E5%B0%8F%E5%8C%96%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md">Debian系统最小化安装教程</a><br>
 <a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Debian%E7%B3%BB%E7%BB%9F%E9%80%9A%E8%BF%87Cockpit%E9%9D%A2%E6%9D%BF%E7%9B%B4%E9%80%9A%E7%A1%AC%E7%9B%98%E5%AE%89%E8%A3%85%E9%BB%91%E7%BE%A4%E6%99%96.md">Debian系统通过Cockpit面板直通硬盘安装黑群晖</a><br>
-
+<a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F%E6%9C%8D%E5%8A%A1Tailscale%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B.md">内网穿透服务Tailscale安装使用教程</a><br>
 
 <h3>Docker相关教程</h3>
 <a href="https://docs.qq.com/doc/p/359de0f852ffbf9ba159dbec3ddcf119c33462f2">HomePage导航页部署教程</a><br>
