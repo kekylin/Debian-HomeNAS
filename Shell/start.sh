@@ -34,7 +34,7 @@ fi
 
 # 定义主地址和备用地址
 MAIN_BASE="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/"
-BACKUP_BASE="https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell"
+BACKUP_BASE="https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/"
 
 # 获取来源名称的函数
 get_source_name() {
