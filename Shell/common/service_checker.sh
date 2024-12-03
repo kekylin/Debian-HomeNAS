@@ -84,7 +84,7 @@ display_firewalld_fail2ban_info() {
         echo ""
     fi
     if [[ "$fail2ban_installed" == "yes" ]]; then
-        log_message "INFO" "Fail2ban服务已安装，登录系统失败5次，访问IP封禁1小时。" "${COLORS[CYAN]}"
+        log_message "INFO" "Fail2ban服务已安装，若登录系统失败5次，访问IP将封禁1小时。" "${COLORS[CYAN]}"
         echo ""
     fi
 }
