@@ -100,7 +100,7 @@ https://localhost:9443
 </details>
 
 ---
-## Debian-HomeNAS交流群
+## 交流Q群
   ```shell
 339169752
   ```
