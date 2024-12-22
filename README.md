@@ -86,10 +86,12 @@ https://localhost:9443
 <a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Debian%E7%B3%BB%E7%BB%9F%E6%9C%80%E5%B0%8F%E5%8C%96%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md">Debian系统最小化安装教程</a><br>
 <a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Debian%E7%B3%BB%E7%BB%9F%E9%80%9A%E8%BF%87Cockpit%E9%9D%A2%E6%9D%BF%E7%9B%B4%E9%80%9A%E7%A1%AC%E7%9B%98%E5%AE%89%E8%A3%85%E9%BB%91%E7%BE%A4%E6%99%96.md">Debian系统通过Cockpit面板直通硬盘安装黑群晖</a><br>
 <a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F%E6%9C%8D%E5%8A%A1Tailscale%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B.md">内网穿透服务Tailscale安装使用教程</a><br>
+<a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Nginx%E5%8F%8D%E4%BB%A3%E9%99%90%E5%88%B6%E5%9B%BD%E5%A4%96IP%E8%AE%BF%E9%97%AE%E6%95%99%E7%A8%8B.md">Nginx反代限制国外IP访问教程</a><br>
 
 <h3>Docker相关教程</h3>
 <a href="https://docs.qq.com/doc/p/359de0f852ffbf9ba159dbec3ddcf119c33462f2">HomePage导航页部署教程</a><br>
 <a href="https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/%E9%83%A8%E7%BD%B2Docker%E7%89%88%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8%E6%95%99%E7%A8%8B.md">部署Docker版谷歌浏览器教程</a><br>
+
 <h3>B站视频</h3>
 <a href="https://www.bilibili.com/video/BV16w4m1m78x">基于Linux搭建HomeNAS最终效果展示(Debian/Ubuntu)</a><br>
 <a href="https://www.bilibili.com/video/BV1az42117pt">基于Debian搭建HomeNAS系列教程之系统安装篇</a><br>
