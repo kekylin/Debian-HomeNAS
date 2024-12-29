@@ -65,7 +65,14 @@ bash <(curl -L -s https://mirror.ghproxy.com/https://raw.githubusercontent.com/0
 
 ## 四、限制国外IP访问
 1、修改`nginx.conf`配置文件  
-直接复制下面配置参数，替换掉你原有的`nginx.conf`配置参数，不用做任何修改。  
+直接复制下面配置参数，替换掉你原有的`nginx.conf`配置参数，只需要修改配置中的内网IP地址段，将其修改为你的内网IP地址段。  
+```bash
+    # 创建允许访问的 IP 变量
+    geo $allow_ip {
+        default 0;  # 默认拒绝
+        192.168.8.0/24 1;  # 允许内网IP段 192.168.8.0/24
+    }
+```
 在替换之前，请先备份，避免出错。  
 备份命令：
 ```bash
