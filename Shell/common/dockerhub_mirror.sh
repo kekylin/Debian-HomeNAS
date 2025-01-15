@@ -22,9 +22,10 @@ log_message() {
 
 # Docker 镜像加速地址
 MIRRORS=(
-    "https://docker.1panel.live"
     "https://docker.ketches.cn"
     "https://hub.iyuu.cn"
+    "https://docker.1panelproxy.com"
+    "https://docker.1panel.live"
 )
 DAEMON_JSON="/etc/docker/daemon.json"
 
