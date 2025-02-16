@@ -51,6 +51,7 @@ declare -A SCRIPT_INFO=(
 
     ["c61"]="install_tailscale.sh #内网穿透服务"
     ["c62"]="service_checker.sh #安装服务查询"
+    ["c63"]="update_hosts.sh #自动更新hosts"
     
     ["u1"]="setup_network_manager.sh #设置Cockpit管理网络"
 )
@@ -73,7 +74,7 @@ declare -A SUBMENU_ITEMS=(
     ["邮件通知服务"]="c31 c32 c33"
     ["系统安全防护"]="c41 c42 c43"
     ["Docker服务"]="c51 c52 c53 c54"
-    ["综合应用服务"]="c61 c62"
+    ["综合应用服务"]="c61 c62 c63"
     ["一键配置HomeNAS"]="basic secure"
 )
 
