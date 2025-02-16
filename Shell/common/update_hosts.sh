@@ -75,7 +75,7 @@ delete_cron_job() {
 save_script_to_user_home() {
     local user_home=$(eval echo ~$USER)
     local script_path="$user_home/update_hosts.sh"
-    curl -s -o "$script_path" https://raw.githubusercontent.com/kekylin/hosts/main/update_hosts.sh
+    curl -s -o "$script_path" https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/common/update_hosts.sh
     log_message "INFO" "定时更新脚本保存在$script_path，请勿删除！" "${COLORS[CYAN]}"
 }
 
