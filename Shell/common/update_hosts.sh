@@ -106,11 +106,11 @@ list_cron_jobs() {
 # 菜单函数
 menu() {
     echo -e "\n请选择操作："
-    echo "1) 单次更新Hosts文件"
-    echo "2) 定时更新Hosts文件"
-    echo "3) 删除定时更新任务"
-    echo "4) 查询定时任务"
-    echo "0) 返回"
+    echo "1、单次更新Hosts文件"
+    echo "2、定时更新Hosts文件"
+    echo "3、删除定时更新任务"
+    echo "4、查询定时任务"
+    echo "0、返回"
     
     read -p "请输入选择: " choice
     
