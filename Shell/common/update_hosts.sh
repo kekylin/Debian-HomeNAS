@@ -69,6 +69,7 @@ update_hosts() {
     else
         echo -e "\n$NEW_HOSTS" | sudo tee -a $HOSTS_FILE > /dev/null
     fi
+
     log_message "SUCCESS" "Hosts文件更新完成！" "${COLORS[GREEN]}"
 }
 
@@ -83,15 +84,17 @@ create_cron_job() {
         crontab -l | grep -v "# Kekylin Hosts Update" | crontab -
     fi
 
+    # 只有当下载成功时才进行后续操作
+    if ! update_hosts; then
+        log_message "ERROR" "取消创建定时任务。" "${COLORS[RED]}"
+        return 1
+    fi
+
     # 复制脚本到用户目录并创建新任务
     cp "$0" "$SCRIPT_PATH"
     cron_job="0 0,6,12,18 * * * /bin/bash $SCRIPT_PATH update_hosts # Kekylin Hosts Update"
-    
-    # 只有当下载成功时才创建定时任务
-    if update_hosts; then
-        (crontab -l 2>/dev/null; echo "$cron_job") | crontab -
-        log_message "SUCCESS" "定时任务已创建，每天的0点、6点、12点和18点自动执行。" "${COLORS[GREEN]}"
-    fi
+    (crontab -l 2>/dev/null; echo "$cron_job") | crontab -
+    log_message "SUCCESS" "定时任务已创建，每天的0点、6点、12点和18点自动执行。" "${COLORS[GREEN]}"
 }
 
 # 查询定时任务
