@@ -37,8 +37,8 @@ SYSTEM_LOWER="${SYSTEM,,}"
 # ======================= 核心功能模块 =======================
 # --- 元数据定义 ---
 BASE_URLS=(
-    "https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/"
-    "https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/"
+    "https://gitee.com/kekylin/Debian-HomeNAS/raw/test/Shell/"
+    "https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/test/Shell/"
 )
 
 declare -A SCRIPT_INFO=(
