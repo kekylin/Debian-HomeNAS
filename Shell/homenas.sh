@@ -87,7 +87,7 @@ declare -A SUBMENU_ITEMS=(
 
 declare -A HOME_NAS_VERSIONS=(
     ["basic"]="c11 c12 c21 c51 c52 c53 c62"
-    ["secure"]="c11 c12 c21 c31 c32 c41 c42 c43 c51 c52 c53 c62 u1 d1"
+    ["secure"]="c11 c12 c21 c31 c32 c41 c42 c43 c51 c52 c53 c62"
 )
 
 declare -A SYSTEM_SPECIFIC_SUBMENU=(
