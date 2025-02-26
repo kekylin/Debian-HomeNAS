@@ -112,8 +112,9 @@ systemctl restart NetworkManager
 check_status "重启 NetworkManager 服务失败"
 wait_for_service "NetworkManager"
 
+# 在应用 Netplan 配置前输出提示
+echo "完成设置 Cockpit 管理网络，连接可能已断开，IP 可能已变更，请检查确认"
+
 # 应用 Netplan 配置
 netplan apply
 check_status "应用 Netplan 配置失败"
-
-echo "完成设置 Cockpit 管理网络，连接可能已断开，IP 可能已变更，请检查确认"
