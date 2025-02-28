@@ -74,8 +74,8 @@ declare -A SCRIPT_INFO=(
     ["c52"]="dockerhub_mirror.sh|添加镜像地址"
     ["c53"]="deploy-containers.sh|安装容器应用"
     ["c54"]="docker_backup_restore.sh|备份与恢复"
-    ["c61"]="install_tailscale.sh|内网穿透服务"
-    ["c62"]="service_checker.sh|安装服务查询"
+    ["c61"]="service_checker.sh|安装服务查询"
+    ["c62"]="install_tailscale.sh|内网穿透服务"
     ["c63"]="update_hosts.sh|自动更新hosts"
     ["u1"]="setup_network_manager.sh|设置Cockpit管理网络(Ubuntu)"
     ["d1"]="setup_network_manager.sh|设置Cockpit管理网络(Debian)"
@@ -107,8 +107,8 @@ declare -A SUBMENU_ITEMS=(
 
 # 定义一键配置版本
 declare -A HOME_NAS_VERSIONS=(
-    ["basic"]="c11 c12 c21 c51 c52 c53 c62"
-    ["secure"]="c11 c12 c21 c31 c32 c41 c42 c43 c51 c52 c53 c62"
+    ["basic"]="c11 c12 c21 c51 c52 c61"
+    ["secure"]="c11 c12 c21 c31 c32 c41 c42 c43 c51 c52 c61"
 )
 
 # 定义系统特定子菜单
