@@ -1,55 +1,120 @@
 #!/bin/bash
 
-# 查找并确认/etc/netplan目录下存在.yaml配置文件
-netplan_file=$(find /etc/netplan/ -name "*.yaml" -print -quit)
+# 常量定义
+NETPLAN_DIR="/etc/netplan"
+NM_CONF_FILE="/etc/NetworkManager/NetworkManager.conf"
+NETPLAN_PERMS=600
 
-if [[ -z "$netplan_file" ]]; then
-    echo "未在 /etc/netplan 目录下找到 .yaml 文件。"
-    exit 1
-fi
+# 全局数组存储备份文件
+declare -A BACKUP_FILES
 
-# 检查是否已设置 renderer: NetworkManager
-if grep -q '^\s*renderer:\s*NetworkManager' "$netplan_file"; then
-    echo "已设置Cockpit管理网络，跳过操作。"
-    exit 0  # 跳过后面所有操作
-fi
-
-# 备份原始文件
-cp "$netplan_file" "${netplan_file}.bak" || { echo "备份失败"; exit 1; }
-
-# 修改文件，确保renderer和ethernets缩进对齐并设置权限
-awk '/^    ethernets:/ { print "    renderer: NetworkManager" } { print }' "$netplan_file" > "${netplan_file}.tmp" && mv "${netplan_file}.tmp" "$netplan_file"
-chmod 600 "$netplan_file" || { echo "设置权限失败"; exit 1; }
-
-# 禁用 systemd-networkd 服务的开机自启
-systemctl is-enabled --quiet systemd-networkd && systemctl disable systemd-networkd
-
-echo "完成设置Cockpit管理网络，此页面连接已断开，且IP地址可能发生改变，请查询确认。"
-
-# NetworkManager配置文件路径
-nm_conf_file="/etc/NetworkManager/NetworkManager.conf"
-
-# 修改NetworkManager配置文件，将managed设置为true
-if [[ -f "$nm_conf_file" ]]; then
-    if ! grep -q '^\[ifupdown\]' "$nm_conf_file"; then
-        echo -e "\n[ifupdown]\nmanaged=true" >> "$nm_conf_file"
-    else
-        # 更新managed行
-        sed -i '/^\[ifupdown\]/,/^\[/ { /^\[ifupdown\]/! { /^managed=/d; } }' "$nm_conf_file"
-        echo "managed=true" >> "$nm_conf_file"
+# 检查命令执行状态
+check_status() {
+    if [ $? -ne 0 ]; then
+        echo "错误: $1"
+        rollback
     fi
-else
-    echo "文件 '$nm_conf_file' 不存在，跳过操作。"
-fi
+}
 
-# 重启Network Manager服务并检查成功
-if systemctl restart NetworkManager; then
-    echo "已重启 Network Manager 服务。"
-else
-    echo "重启 Network Manager 服务失败。"
+# 备份文件并记录
+backup_file() {
+    local file="$1"
+    local backup="${file}.bak-$(date +%Y%m%d%H%M%S)"
+    cp "$file" "$backup"
+    check_status "备份 $file 失败" "$file"
+    BACKUP_FILES["$file"]="$backup"
+}
+
+# 修改Netplan配置
+modify_netplan() {
+    local file="$1"
+    temp_file=$(mktemp)
+    cat > "$temp_file" << EOF
+network:
+  version: 2
+  renderer: NetworkManager
+  ethernets:
+$(sed -n '/^  ethernets:/,$p' "$file" | sed '1d')
+EOF
+    mv "$temp_file" "$file"
+    check_status "更新 $file 失败" "$file"
+}
+
+# 回滚所有修改
+rollback() {
+    for file in "${!BACKUP_FILES[@]}"; do
+        if [ -f "${BACKUP_FILES[$file]}" ]; then
+            mv "${BACKUP_FILES[$file]}" "$file"
+            echo "已回滚 $file"
+        fi
+    done
+    exit 1
+}
+
+# 检查服务是否就绪
+wait_for_service() {
+    local service="$1"
+    local retries=5
+    local delay=1
+    for ((i=0; i<retries; i++)); do
+        if systemctl is-active "$service" >/dev/null 2>&1; then
+            return 0
+        fi
+        sleep "$delay"
+    done
+    echo "错误: $service 未就绪"
+    rollback
+}
+
+# 主流程
+# 检查目录是否存在
+if [ ! -d "$NETPLAN_DIR" ]; then
+    echo "错误: $NETPLAN_DIR 目录不存在"
     exit 1
 fi
 
-# 应用netplan配置
-sleep 5 # 等待5秒确保网络操作完成
-netplan apply || { echo "应用netplan配置失败。"; exit 1; }
+# 查找并处理Netplan配置文件（支持 .yaml 和 .yml）
+netplan_files=$(find "$NETPLAN_DIR" -name "*.yaml" -o -name "*.yml")
+if [ -z "$netplan_files" ]; then
+    echo "未在 $NETPLAN_DIR 目录下找到 .yaml 或 .yml 文件"
+    exit 1
+fi
+
+for file in $netplan_files; do
+    if ! grep -q 'renderer:[[:space:]]*NetworkManager' "$file"; then
+        backup_file "$file"
+        modify_netplan "$file"
+        chmod "$NETPLAN_PERMS" "$file"
+    fi
+done
+
+# 检查并禁用 systemd-networkd
+if systemctl list-units --full -all strange systemd-networkd.service | grep -q "systemd-networkd.service"; then
+    systemctl disable systemd-networkd
+    check_status "禁用 systemd-networkd 失败"
+else
+    echo "警告: systemd-networkd 服务不存在，跳过禁用"
+fi
+
+# 配置并备份 NetworkManager
+if [ -f "$NM_CONF_FILE" ]; then
+    backup_file "$NM_CONF_FILE"
+    if ! grep -q '^\[ifupdown\]' "$NM_CONF_FILE"; then
+        echo -e "\n[ifupdown]\nmanaged=true" >> "$NM_CONF_FILE"
+    else
+        sed -i '/^\[ifupdown\]/,/^managed=/ { /^managed=/d; }; /^\[ifupdown\]/a managed=true' "$NM_CONF_FILE"
+    fi
+    check_status "更新 NetworkManager 配置失败"
+fi
+
+# 重启 NetworkManager 服务并等待就绪
+systemctl restart NetworkManager
+check_status "重启 NetworkManager 服务失败"
+wait_for_service "NetworkManager"
+
+# 在应用 Netplan 配置前输出提示
+echo "完成设置 Cockpit 管理网络，连接可能已断开，IP 可能已变更，请检查确认"
+
+# 应用 Netplan 配置
+netplan apply
+check_status "应用 Netplan 配置失败"

@@ -41,11 +41,11 @@ su -
 
 国内用户
   ```shell
-SUDO=$(command -v sudo || echo "") ; $SUDO bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/start.sh)"
+SUDO=$(command -v sudo || echo "") ; $SUDO bash -c "$(wget -qO- https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/homenas.sh)"
   ```
 Github直连
   ```shell
-SUDO=$(command -v sudo || echo "") ; $SUDO bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/start.sh)"
+SUDO=$(command -v sudo || echo "") ; $SUDO bash -c "$(wget -qO- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/homenas.sh)"
   ```
 
 ### 4、登陆使用
