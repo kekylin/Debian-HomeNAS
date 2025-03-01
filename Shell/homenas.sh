@@ -52,8 +52,8 @@ detect_system() {
 # ======================= 核心功能模块 =======================
 # 定义脚本下载基础 URL
 BASE_URLS=(
-    "https://gitee.com/kekylin/Debian-HomeNAS/raw/test/Shell/"
-    "https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/test/Shell/"
+    "https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/"
+    "https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/"
 )
 
 # 定义脚本信息
