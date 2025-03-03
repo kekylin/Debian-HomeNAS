@@ -126,6 +126,6 @@ https://localhost:9443
   />
 </picture>
 
-## 支持与赞赏：
+## 支持与赞赏
 如果觉得本项目对您有所帮助，欢迎通过赞赏来支持我的工作！  
 ![赞赏码](https://github.com/user-attachments/assets/0e79f8b6-fc8b-41d7-80b2-7bd8ce2f1dee)
