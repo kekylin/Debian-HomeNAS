@@ -106,6 +106,26 @@ https://localhost:9443
   ```shell
 339169752
   ```
+## 星标历史
+<picture>
+  <source
+    media="(prefers-color-scheme: dark)"
+    srcset="
+      https://api.star-history.com/svg?repos=kekylin/Debian-HomeNAS&type=Date&theme=dark
+    "
+  />
+  <source
+    media="(prefers-color-scheme: light)"
+    srcset="
+      https://api.star-history.com/svg?repos=kekylin/Debian-HomeNAS&type=Date
+    "
+  />
+  <img
+    alt="Star History Chart"
+    src="https://api.star-history.com/svg?repos=kekylin/Debian-HomeNAS&type=Date"
+  />
+</picture>
+
 ## 支持与赞赏：
 如果觉得本项目对您有所帮助，欢迎通过赞赏来支持我的工作！  
 ![赞赏码](https://github.com/user-attachments/assets/0e79f8b6-fc8b-41d7-80b2-7bd8ce2f1dee)
