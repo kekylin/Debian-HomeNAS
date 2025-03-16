@@ -12,7 +12,7 @@ RESET_COLOR="\033[0m"
 log_message() {
     local type="${1^^}" message="$2" color
     case "$type" in
-        INFO)    color="$BLUE_COLOR"   ;;
+        INFO)    color="$CYAN_COLOR"   ;;
         SUCCESS) color="$GREEN_COLOR"  ;;
         ERROR)   color="$RED_COLOR"    ;;
         *)       color="$YELLOW_COLOR"; type="WARNING" ;;
