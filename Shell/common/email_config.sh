@@ -162,7 +162,7 @@ main() {
     
     prompt_message "请输入系统通知接收邮箱地址："
     local notify_email
-    while read -r notify_email && [[ ! "$notify_email" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-Z]{2,}$ ]]; do
+    while read -r notify_email && [[ ! "$notify_email" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; do
         log_message "ERROR" "通知邮箱地址格式无效或为空"
         prompt_message "请输入有效的通知接收邮箱地址："
     done
