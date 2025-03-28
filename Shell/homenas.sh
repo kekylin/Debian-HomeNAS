@@ -57,26 +57,22 @@ declare -A BASE_URL_MAP=(
 )
 
 # 解析命令行参数
-SOURCE=""
-while [[ $# -gt 0 ]]; do
-    case "$1" in
-        -s)
-            shift
-            SOURCE="$1"
+SOURCE="gitee"  # 默认值
+
+while getopts "s:" opt; do
+    case "${opt}" in
+        s)
+            SOURCE="${OPTARG}"
             ;;
         *)
+            # getopts 会自动处理无效选项
             ;;
     esac
-    shift
 done
 
 # 检查 SOURCE 是否有效
-if [[ -z "${SOURCE}" ]]; then
+if [[ -z "${BASE_URL_MAP[$SOURCE]}" ]]; then
     SOURCE="github"
-elif [[ -z "${BASE_URL_MAP[$SOURCE]}" ]]; then
-    SOURCE="github"
-else
-    :
 fi
 
 # 定义脚本信息
