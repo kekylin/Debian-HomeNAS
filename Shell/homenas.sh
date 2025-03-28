@@ -50,11 +50,30 @@ detect_system() {
 }
 
 # ======================= 核心功能模块 =======================
-# 定义脚本下载基础 URL
-BASE_URLS=(
-    "https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/"
-    "https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/"
+# 定义下载源映射
+declare -A BASE_URL_MAP=(
+    ["gitee"]="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/"
+    ["github"]="https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/"
 )
+
+# 解析命令行参数
+SOURCE="github"  # 默认值
+
+while getopts "s:" opt; do
+    case "${opt}" in
+        s)
+            SOURCE="${OPTARG}"
+            ;;
+        *)
+            # getopts 会自动处理无效选项
+            ;;
+    esac
+done
+
+# 检查 SOURCE 是否有效
+if [[ -z "${BASE_URL_MAP[$SOURCE]}" ]]; then
+    SOURCE="github"
+fi
 
 # 定义脚本信息
 declare -A SCRIPT_INFO=(
@@ -136,15 +155,12 @@ get_script_subdir() {
 }
 
 # 获取脚本下载 URL
-get_script_urls() {
+get_script_url() {
     local key="${1}"
     local script_name="${SCRIPT_INFO[$key]%%|*}"
     local subdir=$(get_script_subdir "${key}")
-    local urls=()
-    for base in "${BASE_URLS[@]}"; do
-        urls+=("${base}${subdir}/${script_name}")
-    done
-    echo "${urls[*]}"
+    local base_url="${BASE_URL_MAP[$SOURCE]}"
+    echo "${base_url}${subdir}/${script_name}"
 }
 
 # 验证用户输入
@@ -171,44 +187,41 @@ run_script() {
     local key="${1}" system="${2}" system_lower="${3}"
     local script_name="${SCRIPT_INFO[$key]%%|*}"
     local chinese_desc=$(get_chinese_desc "${key}")
-    local urls=($(get_script_urls "${key}"))
+    local url=$(get_script_url "${key}")
     local script_dir="/tmp/homenas_script"
     local script_path="${script_dir}/${script_name}"
     local success=false
-    local url short_url max_retries=2 retry_count
+    local short_url=$([[ "${url}" == *gitee* ]] && echo "Gitee" || echo "Github")
+    local max_retries=2
+    local retry_count=0
 
     if ! is_script_applicable "${key}" "${system_lower}"; then
         output "ERROR" "脚本 \"${key}\" 不适用于当前系统 (${system})" "" "true"
         return 1
     fi
     
-    for url in "${urls[@]}"; do
-        short_url=$([[ "${url}" == *gitee* ]] && echo "Gitee" || echo "Github")
-        output "INFO" "正在从 ${short_url} 下载 \"${chinese_desc}\"，地址: ${url}" "" "true"
-        retry_count=0
-        while :; do
-            if wget -q --connect-timeout=15 --timeout=30 "${url}" -O "${script_path}" || return 1; then
-                success=true
-                chmod +x "${script_path}"
-                output "SUCCESS" "开始执行 \"${chinese_desc}\"..." "" "true"
-                bash "${script_path}" || return 1
-                break
+    output "INFO" "正在从 ${short_url} 下载 \"${chinese_desc}\"，地址: ${url}" "" "true"
+    
+    while [[ "${retry_count}" -le "${max_retries}" ]]; do
+        if wget -q --connect-timeout=15 --timeout=30 "${url}" -O "${script_path}"; then
+            success=true
+            break
+        else
+            ((retry_count++))
+            if [[ "${retry_count}" -le "${max_retries}" ]]; then
+                output "WARNING" "下载失败，第 ${retry_count} 次重试..." "" "true"
+                sleep 1
             else
-                if (( retry_count >= max_retries )); then
-                    output "ERROR" "${short_url} 下载失败，切换地址重试..." "" "true"
-                    break
-                else
-                    ((retry_count++))
-                    output "WARNING" "下载失败，第 ${retry_count} 次重试..." "" "true"
-                    sleep 1
-                fi
+                output "ERROR" "下载失败，已达到最大重试次数，请检查网络。" "" "true"
             fi
-        done
-        [[ "${success}" == "true" ]] && break
+        fi
     done
     
-    if [[ "${success}" == "false" ]]; then
-        output "ERROR" "所有下载地址均失败" "" "true"
+    if [[ "${success}" == "true" ]]; then
+        chmod +x "${script_path}"
+        output "SUCCESS" "开始执行 \"${chinese_desc}\"..." "" "true"
+        bash "${script_path}" || return 1
+    else
         return 1
     fi
 }
@@ -268,7 +281,9 @@ display_submenu() {
     while true; do
         printf "%b请选择操作: %b" "${COLORS[ACTION]}" "${COLORS[RESET]}"
         read -r choices || break
-        [[ -z "${choices}" ]] && output "ERROR" "输入为空，请重新输入" "" "true" && continue
+       
+
+ [[ -z "${choices}" ]] && output "ERROR" "输入为空，请重新输入" "" "true" && continue
         [[ ! "${choices}" =~ ^[0-9\ ]+$ ]] && output "ERROR" "输入包含无效字符，仅支持数字和空格" "" "true" && continue
         
         IFS=' ' read -r -a choice_array <<< "${choices}"
