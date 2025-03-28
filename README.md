@@ -41,11 +41,11 @@ su -
 
 Github地址
   ```shell
-SUDO=$(command -v sudo); ${SUDO:-} bash -c "$(wget -O- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/homenas.sh)"
+SUDO=$(command -v sudo); ${SUDO:-} bash -c "bash <(wget -O- https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/homenas.sh) -s github"
   ```
 Gitee地址（国内用户推荐）
   ```shell
-SUDO=$(command -v sudo); ${SUDO:-} bash -c "$(wget -O- https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/homenas.sh) -s gitee"
+SUDO=$(command -v sudo); ${SUDO:-} bash -c "bash <(wget -O- https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/homenas.sh) -s gitee"
   ```
 
 ### 4、登陆使用
