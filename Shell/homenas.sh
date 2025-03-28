@@ -52,12 +52,16 @@ detect_system() {
 # ======================= 核心功能模块 =======================
 # 定义下载源映射
 declare -A BASE_URL_MAP=(
+# 正式分支
     ["gitee"]="https://gitee.com/kekylin/Debian-HomeNAS/raw/main/Shell/"
     ["github"]="https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/main/Shell/"
+# 测试分支
+    ["giteetest"]="https://gitee.com/kekylin/Debian-HomeNAS/raw/test/Shell/"
+    ["githubtest"]="https://raw.githubusercontent.com/kekylin/Debian-HomeNAS/refs/heads/test/Shell/"
 )
 
 # 解析命令行参数
-SOURCE="gitee"  # 默认值
+SOURCE="github"  # 默认值
 
 while getopts "s:" opt; do
     case "${opt}" in
