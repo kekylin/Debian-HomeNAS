@@ -91,9 +91,9 @@ update_hosts() {
 
     # 更新文件内容
     if [ -z "$(tail -n 1 $HOSTS_FILE)" ]; then
-        echo -e "$NEW_HOSTS" | sudo tee -a $HOSTS_FILE > /dev/null
+        echo -e "$NEW_HOSTS" | tee -a $HOSTS_FILE > /dev/null
     else
-        echo -e "\n$NEW_HOSTS" | sudo tee -a $HOSTS_FILE > /dev/null
+        echo -e "\n$NEW_HOSTS" | tee -a $HOSTS_FILE > /dev/null
     fi
 
     log_message "SUCCESS" "Hosts文件更新完成！" "${COLORS[GREEN]}"
