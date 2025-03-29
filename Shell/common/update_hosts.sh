@@ -20,6 +20,30 @@ log_message() {
     echo -e "${color}[${msg_type}] ${msg}${COLORS[RESET]}"
 }
 
+# 检查下载工具
+check_download_tool() {
+    if command -v curl >/dev/null 2>&1; then
+        DOWNLOAD_TOOL="curl"
+    elif command -v wget >/dev/null 2>&1; then
+        DOWNLOAD_TOOL="wget"
+    else
+        log_message "ERROR" "未找到curl或wget，请先安装其中之一" "${COLORS[RED]}"
+        exit 1
+    fi
+}
+
+# 下载函数
+download_hosts() {
+    local url="$1"
+    if [ "$DOWNLOAD_TOOL" = "curl" ]; then
+        curl -s -k -L --max-time 15 "$url"
+        return $?
+    else
+        wget -q -O - --timeout=15 "$url" 2>/dev/null
+        return $?
+    fi
+}
+
 # 设置hosts文件路径
 HOSTS_FILE="/etc/hosts"
 START_MARK="# Kekylin Hosts Start"
@@ -35,14 +59,16 @@ update_hosts() {
     local url
     NEW_HOSTS=""
 
+    # 检查下载工具
+    check_download_tool
+
     # 尝试多个下载地址
     for url in "${DOWNLOAD_URLS[@]}"; do
         log_message "INFO" "尝试从 $url 下载 Hosts 文件..." "${COLORS[CYAN]}"
         
-        # 使用curl并设置超时限制为15秒
-        NEW_HOSTS=$(curl -s -k -L --max-time 15 "$url")
+        NEW_HOSTS=$(download_hosts "$url")
         
-        # 检查是否下载成功，curl的返回码为0表示成功
+        # 检查是否下载成功
         if [ $? -eq 0 ] && [ -n "$NEW_HOSTS" ]; then
             log_message "SUCCESS" "成功从 $url 下载 Hosts 文件。" "${COLORS[GREEN]}"
             break
