@@ -41,7 +41,7 @@ manage_file() {
     case "$action" in
         exists) [[ -f "$file" ]] || return 1 ;;
         clear)  : > "$file" || exit_with_error "$err_msg" ;;
-        create) touch "$file" && chown root:root "$file" && chmod 700 "$file" || exit_with_error "$err_msg" ;;
+        create) touch "$file" && chown root:root "$file" && chmod 755 "$file" || exit_with_error "$err_msg" ;;
     esac
 }
 
