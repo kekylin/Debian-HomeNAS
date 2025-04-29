@@ -16,16 +16,20 @@
 
 ![2、最终成果](https://github.com/user-attachments/assets/b30d4eb4-350f-48da-bdb8-81b313326f07)
 
-#### [更多搭建成果展示图（点此打开查看）](https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/%E6%88%90%E6%9E%9C%E5%B1%95%E7%A4%BA.md)
+#### [更多搭建成果展示图（点此打开查看）](https://kekylin.github.io/debnas-docs/guide/achievement/)
 ---
 
 ## 支持系统
 Debian-12.x-amd64  
 Ubuntu 24.04 LTS-amd64  
 
-## 使用方法
+## 使用文档
+[DebNAS文档](https://kekylin.github.io/debnas-docs/ "DebNAS文档")
+
+## 快速开始
 ### 1、安装系统
-安装教程：[Debian系统最小化安装教程](https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/Debian%E7%B3%BB%E7%BB%9F%E6%9C%80%E5%B0%8F%E5%8C%96%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md)
+[Debian系统最小化安装教程](https://kekylin.github.io/debnas-docs/guide/debian-minimal-installation/)  
+[Ubuntu系统最小化安装教程](https://kekylin.github.io/debnas-docs/guide/ubuntu-minimal-installation/)
 ### 2、连接系统
 系统安装完成后，使用SSH工具连接上系统，输入下面运行脚本命令开启脚本。  
 > 注意：  
@@ -37,7 +41,7 @@ su -
   ```
 
 ### 3、运行脚本
-运行脚本前，建议先阅读[脚本介绍](https://github.com/kekylin/Debian-HomeNAS/blob/main/Docs/%E8%84%9A%E6%9C%AC%E4%BB%8B%E7%BB%8D.md)，了解脚本能做什么先，脚本中的选项可以按需执行。运行脚本命令（二选一）  
+运行脚本前，建议先阅读[脚本介绍](https://kekylin.github.io/debnas-docs/guide/script-introduction/)，了解脚本能做什么先，脚本中的选项可以按需执行。运行脚本命令（二选一）  
 
 Github地址
   ```shell
