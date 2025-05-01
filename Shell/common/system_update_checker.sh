@@ -1,33 +1,37 @@
 #!/bin/bash
 
 # ======================= 基础工具模块 =======================
-# 定义终端颜色代码
-declare -A color_codes=(
-    ["info"]=$'\e[0;36m'    # 青色
-    ["success"]=$'\e[0;32m' # 绿色
-    ["warning"]=$'\e[0;33m' # 黄色
-    ["error"]=$'\e[0;31m'   # 红色
-    ["action"]=$'\e[0;34m'  # 蓝色
-    ["white"]=$'\e[1;37m'   # 粗体白色
-    ["reset"]=$'\e[0m'      # 重置颜色
+# 定义终端输出颜色代码
+declare -A COLORS=(
+    ["INFO"]=$'\e[0;36m'    # 青色
+    ["SUCCESS"]=$'\e[0;32m' # 绿色
+    ["WARNING"]=$'\e[0;33m' # 黄色
+    ["ERROR"]=$'\e[0;31m'   # 红色
+    ["ACTION"]=$'\e[0;34m'  # 蓝色
+    ["WHITE"]=$'\e[1;37m'   # 粗体白色
+    ["RESET"]=$'\e[0m'      # 重置颜色
 )
 
-# 打印格式化消息
+# 输出带颜色消息
 # 参数: 类型, 消息内容, 自定义颜色(可选), 是否添加前缀(默认false)
-print_message() {
+output() {
     local type="${1}" msg="${2}" custom_color="${3}" is_log="${4:-false}"
-    local color="${custom_color:-${color_codes[$type]}}"
+    local color="${custom_color:-${COLORS[$type]}}"
     local prefix=""
     
-    [[ -z "${color}" ]] && color="${color_codes[info]}"
-    [[ "${is_log}" == "true" ]] && prefix="[${type^^}] "
-    echo -e "${color}${prefix}${msg}${color_codes[reset]}"
+    if [[ -z "${color}" ]]; then
+        echo "[DEBUG] 无效类型: ${type}，默认使用 INFO" >&2
+        color="${COLORS[INFO]}"
+    fi
+    
+    [[ "${is_log}" == "true" ]] && prefix="[${type}] "
+    printf "%s%s%s\n" "${color}" "${prefix}${msg}" "${COLORS[RESET]}"
 }
 
 # ======================= 常量定义模块 =======================
 # 定义文件路径常量
 email_config_file="/etc/exim4/notify_email"
-cron_task_file="/etc/cron.d/update-check"
+cron_task_file="/etc/cron.d/system-update-checker"
 
 # ======================= 通用函数模块 =======================
 # 验证系统支持，仅支持 Debian 和 Ubuntu
@@ -41,7 +45,7 @@ verify_system_support() {
     system=$(echo "$system" | tr '[:upper:]' '[:lower:]')
     
     if [[ "$system" != "debian" && "$system" != "ubuntu" ]]; then
-        print_message "error" "不支持的系统 (${system})，仅支持 Debian 和 Ubuntu" "" "true"
+        output "ERROR" "不支持的系统 (${system})，仅支持 Debian 和 Ubuntu" "" "true"
         exit 1
     fi
 }
@@ -65,14 +69,94 @@ get_hostname() {
     fi
 }
 
-# 获取并验证邮箱配置
+# 验证并获取邮箱配置
 # 返回: 邮箱地址
 get_email_config() {
     if [ ! -f "$email_config_file" ] || [ -z "$(cat "$email_config_file")" ]; then
-        print_message "error" "未找到有效的邮箱配置，文件 ${email_config_file} 不存在或为空" "" "true"
+        output "ERROR" "未找到有效的邮箱配置，文件 ${email_config_file} 不存在或为空" "" "true"
         exit 1
     fi
     echo "$(cat "$email_config_file")"
+}
+
+# 设置脚本文件并赋予权限
+# 返回: 0 (成功), 1 (失败)
+setup_script_file() {
+    local current_script=$(readlink -f "$0")
+    USER_HOME=$(eval echo ~$USER)
+    local script_path="$USER_HOME/.system-update-checker.sh"
+    
+    if [ "$current_script" != "$script_path" ]; then
+        cp "$current_script" "$script_path" 2>/dev/null
+        if [ $? -ne 0 ]; then
+            output "ERROR" "无法复制脚本到 ${script_path}，请检查权限" "" "true"
+            return 1
+        fi
+        chmod +x "$script_path" 2>/dev/null
+    fi
+    
+    if [ ! -f "$script_path" ]; then
+        output "ERROR" "脚本文件 ${script_path} 不存在，请确保脚本已正确复制" "" "true"
+        return 1
+    fi
+    echo "$script_path"
+    return 0
+}
+
+# 验证 cron 表达式
+# 参数: cron 表达式
+# 返回: 0 (有效), 1 (无效)
+validate_cron_expression() {
+    local cron="$1"
+    local fields=($cron)
+    
+    if [ ${#fields[@]} -ne 5 ]; then
+        output "ERROR" "Cron 表达式必须包含 5 个字段（分钟 小时 日 月 星期）" "" "true"
+        return 1
+    fi
+    
+    local minute="${fields[0]}" hour="${fields[1]}" day="${fields[2]}" month="${fields[3]}" weekday="${fields[4]}"
+    local field ranges=("0-59" "0-23" "1-31" "1-12" "0-7")
+    local i
+    
+    for i in {0..4}; do
+        local value="${fields[$i]}" range="${ranges[$i]}"
+        local min=${range%-*} max=${range#*-}
+        
+        # 检查基本格式：数字、*、范围、步长、列表
+        if [[ "$value" =~ ^[0-9*]+(-[0-9]+)?(/[0-9]+)?$ || "$value" =~ ^[0-9]+(,[0-9]+)*$ || "$value" == "*" ]]; then
+            if [[ "$value" != "*" ]]; then
+                if [[ "$value" =~ ^([0-9]+)-([0-9]+)$ ]]; then
+                    local start=${BASH_REMATCH[1]} end=${BASH_REMATCH[2]}
+                    if [ "$start" -lt "$min" ] || [ "$end" -gt "$max" ] || [ "$start" -gt "$end" ]; then
+                        output "ERROR" "字段 ${value} 超出范围 ${range}" "" "true"
+                        return 1
+                    fi
+                elif [[ "$value" =~ ^([0-9]+)/([0-9]+)$ ]]; then
+                    local start=${BASH_REMATCH[1]} step=${BASH_REMATCH[2]}
+                    if [ "$start" -lt "$min" ] || [ "$start" -gt "$max" ] || [ "$step" -eq 0 ]; then
+                        output "ERROR" "步长字段 ${value} 无效" "" "true"
+                        return 1
+                    fi
+                elif [[ "$value" =~ ^([0-9]+)(,([0-9]+))*$ ]]; then
+                    IFS=',' read -r -a numbers <<< "$value"
+                    for num in "${numbers[@]}"; do
+                        if [ "$num" -lt "$min" ] || [ "$num" -gt "$max" ]; then
+                            output "ERROR" "列表值 ${num} 超出范围 ${range}" "" "true"
+                            return 1
+                        fi
+                    done
+                elif ! [[ "$value" =~ ^[0-9]+$ ]] || [ "$value" -lt "$min" ] || [ "$value" -gt "$max" ]; then
+                    output "ERROR" "字段 ${value} 超出范围 ${range}" "" "true"
+                    return 1
+                fi
+            fi
+        else
+            output "ERROR" "字段 ${value} 包含无效字符或格式" "" "true"
+            return 1
+        fi
+    done
+    return 0
 }
 
 # ======================= 报告生成模块 =======================
@@ -80,16 +164,30 @@ get_email_config() {
 # 参数: 更新数据, 更新计数, 标题
 format_update_list() {
     local updates="$1" count="$2" title="$3"
-    [[ $count -gt 0 ]] && echo -e "\n${title}（${count}个）：\n$(echo -e "$updates" | awk '/^Inst/ {printf "● %s: [%s] → (%s\n", $2, $3, $4}')"
+    [[ $count -gt 0 ]] && printf "%s\n%s\n" "${title}（${count}个）：" "$(echo -e "$updates" | awk '/^Inst/ {printf "● %s: [%s] → (%s\n", $2, $3, $4}')"
 }
 
 # 检测系统版本更新
 # 返回: 系统版本更新信息（若有）
 detect_major_version_update() {
-    local current_version=$(cat /etc/debian_version 2>/dev/null || echo "未知")
-    local release_info=$(apt-get -s dist-upgrade | grep -i "inst.*debian.*release")
     local system_name=$(get_system_name)
+    local current_version
     
+    if [[ "$system_name" == "Debian" ]]; then
+        if [ -f /etc/debian_version ]; then
+            current_version=$(cat /etc/debian_version)
+        else
+            current_version=$(grep -oP '^VERSION_ID="\K[0-9.]+' /etc/os-release || echo "未知")
+        fi
+    else  # Ubuntu
+        if command -v lsb_release >/dev/null 2>&1; then
+            current_version=$(lsb_release -rs)
+        else
+            current_version=$(grep -oP '^VERSION_ID="\K[0-9.]+' /etc/os-release || echo "未知")
+        fi
+    fi
+    
+    local release_info=$(apt-get -s dist-upgrade | grep -i "inst.*${system_name}.*release" -i)
     if [[ -n "$release_info" ]]; then
         local new_version=$(echo "$release_info" | awk '{print $2}' | grep -o '[0-9]\+\.[0-9]\+')
         if [[ -n "$new_version" && "$new_version" != "$current_version" ]]; then
@@ -98,35 +196,37 @@ detect_major_version_update() {
     fi
 }
 
-# 构建报告内容
+# 生成报告内容
 # 参数: 安全更新数据, 安全更新计数, 常规更新数据, 常规更新计数
 build_report_content() {
     local security_update_list="$1" security_update_count="$2" regular_update_list="$3" regular_update_count="$4"
     local total=$((security_update_count + regular_update_count))
     local major_update_info=$(detect_major_version_update)
     
-    echo -e "更新摘要："
-    echo -e "总可用更新: ${total} 个 | 安全更新: ${security_update_count} 个 | 常规更新: ${regular_update_count} 个\n"
-    echo -e "更新详情："
-    [[ -n "$major_update_info" ]] && echo -e "系统版本更新:\n${major_update_info}\n"
+    printf "更新摘要：\n"
+    printf "总可用更新: %s 个 | 安全更新: %s 个 | 常规更新: %s 个\n\n" "${total}" "${security_update_count}" "${regular_update_count}"
+    printf "更新详情：\n"
+    [[ -n "$major_update_info" ]] && printf "系统版本更新:\n%s\n" "${major_update_info}"
     format_update_list "$security_update_list" "$security_update_count" "安全更新"
+    [[ -n "$major_update_info" || $security_update_count -gt 0 ]] && printf "\n"
     format_update_list "$regular_update_list" "$regular_update_count" "常规更新"
-    echo -e "\n检测时间: $(date +'%Y-%m-%d %H:%M:%S')"
+    printf "\n检测时间: %s\n" "$(date +'%Y-%m-%d %H:%M:%S')"
+    printf "\n如需了解更多 [Debian-HomeNAS] 使用方法，请访问 https://github.com/kekylin/Debian-HomeNAS\n\n此邮件为系统自动发送，请勿直接回复。\n"
 }
 
-# 运行更新检查并生成报告
+# 执行更新检测并生成报告
 run_update_check() {
-    print_message "info" "正在生成系统更新报告" "" "true"
+    output "INFO" "正在生成系统更新报告" "" "true"
     apt-get update > /dev/null 2>&1
     full_update_list=$(apt-get upgrade -s)
     
-    security_update_list=$(echo "$full_update_list" | grep -i security | grep '^Inst')
-    security_update_count=$(echo "$security_update_list" | grep -c "^Inst")
+    declare -g security_update_list=$(echo "$full_update_list" | grep -i security | grep '^Inst')
+    declare -g security_update_count=$(echo "$security_update_list" | grep -c "^Inst")
     
-    regular_update_list=$(echo "$full_update_list" | grep -v -i security | grep '^Inst')
-    regular_update_count=$(echo "$regular_update_list" | grep -c "^Inst")
+    declare -g regular_update_list=$(echo "$full_update_list" | grep -v -i security | grep '^Inst')
+    declare -g regular_update_count=$(echo "$regular_update_list" | grep -c "^Inst")
     
-    report_content=$(build_report_content "$security_update_list" "$security_update_count" "$regular_update_list" "$regular_update_count")
+    declare -g report_content=$(build_report_content "$security_update_list" "$security_update_count" "$regular_update_list" "$regular_update_count")
 }
 
 # ======================= 邮件通知模块 =======================
@@ -137,10 +237,10 @@ send_email_notification() {
     local major_update_info=$(detect_major_version_update)
     local update_types=()
     
-    # 检测更新类型
-    [[ -n "$major_update_info" ]] && update_types+=("系统版本")
-    [[ $security_update_count -gt 0 ]] && update_types+=("安全")
-    [[ $regular_update_count -gt 0 ]] && update_types+=("常规")
+    # 确定更新类型
+    [[ -n "$major_update_info" ]] && update_types+=("'系统'")
+    [[ $security_update_count -gt 0 ]] && update_types+=("'安全'")
+    [[ $regular_update_count -gt 0 ]] && update_types+=("'常规'")
     
     # 生成动态主题
     local subject=""
@@ -159,8 +259,74 @@ send_email_notification() {
             ;;
     esac
     
-    print_message "info" "正在发送通知邮件至 ${notify_email}" "" "true"
+    output "INFO" "正在发送通知邮件至 ${notify_email}" "" "true"
     echo -e "$report_content" | mail -s "[${hostname} 更新通知] ${subject}" "$notify_email"
+}
+
+# ======================= 执行检测模块 =======================
+# 执行更新检测并处理结果
+execute_update_check() {
+    verify_system_support
+    run_update_check
+    if [[ $security_update_count -gt 0 || $regular_update_count -gt 0 ]]; then
+        send_email_notification
+        output "SUCCESS" "检测到更新，已发送通知邮件" "" "true"
+    else
+        output "INFO" "系统已是最新状态，无可用更新" "" "true"
+    fi
+    sleep 2
+}
+
+# ======================= 定时任务模块 =======================
+# 配置 cron 定时任务
+# 参数: 任务类型 (daily/weekly)
+set_cron_task() {
+    local schedule=$1 cron
+    local script_path=$(setup_script_file) || return 1
+    
+    rm -f "$cron_task_file" 2>/dev/null
+    [[ "$schedule" == "daily" ]] && cron="0 0 * * *" || cron="0 0 * * 1"
+    echo "$cron root $script_path --check" > "$cron_task_file"
+    chmod 644 "$cron_task_file"
+    systemctl restart cron
+    [[ "$schedule" == "daily" ]] && output "SUCCESS" "已设置每日检测任务" "" "true" || output "SUCCESS" "已设置每周检测任务" "" "true"
+    sleep 1
+}
+
+# 配置自定义 cron 定时任务
+set_custom_cron_task() {
+    local script_path=$(setup_script_file) || return 1
+    local cron
+    
+    read -p "请输入 cron 表达式（示例：0 0 * * * 表示每日00:00）： " cron
+    validate_cron_expression "$cron" || return 1
+    
+    rm -f "$cron_task_file" 2>/dev/null
+    echo "$cron root $script_path --check" > "$cron_task_file"
+    chmod 644 "$cron_task_file"
+    systemctl restart cron
+    output "SUCCESS" "已设置自定义检测任务（${cron}）" "" "true"
+    sleep 1
+}
+
+# 列出当前 cron 定时任务
+list_cron_tasks() {
+    if [ -f "$cron_task_file" ]; then
+        output "INFO" "当前定时任务：$(cat "$cron_task_file")" "" "true"
+    else
+        output "INFO" "无定时任务" "" "true"
+    fi
+    sleep 2
+}
+
+# 移除 cron 定时任务
+remove_cron_task() {
+    USER_HOME=$(eval echo ~$USER)
+    rm -f "$cron_task_file" 2>/dev/null
+    rm -f "$USER_HOME/.system-update-checker.sh" 2>/dev/null
+    systemctl restart cron
+    output "SUCCESS" "已移除定时任务并删除关联脚本 ${USER_HOME}/.system-update-checker.sh" "" "true"
+    sleep 1
 }
 
 # ======================= 菜单模块 =======================
@@ -176,7 +342,7 @@ main_menu() {
             3) list_cron_tasks ;;
             4) remove_cron_task ;;
             0) exit 0 ;;
-            *) print_message "error" "无效的操作选项，请重新选择" "" "true" ;;
+            *) output "ERROR" "无效的操作选项，请重新选择" "" "true" ;;
         esac
     done
 }
@@ -184,84 +350,16 @@ main_menu() {
 # 显示定时检测子菜单并处理用户选择
 schedule_menu() {
     while true; do
-        echo -e "---------------------\n1. 每日检测（12:00）\n2. 每周检测（周一12:00）\n3. 自定义定时检测\n0. 返回\n---------------------"
+        echo -e "---------------------\n1. 每日检测（00:00）\n2. 每周检测（周一00:00）\n3. 自定义定时检测\n0. 返回\n---------------------"
         read -p "请选择操作： " subchoice
         case $subchoice in
             1) set_cron_task "daily"; return ;;
             2) set_cron_task "weekly"; return ;;
             3) set_custom_cron_task; return ;;
             0) return ;;
-            *) print_message "error" "无效的操作选项，请重新选择" "" "true" ;;
+            *) output "ERROR" "无效的操作选项，请重新选择" "" "true" ;;
         esac
     done
-}
-
-# ======================= 定时任务模块 =======================
-# 设置 cron 任务
-# 参数: 任务类型 (daily/weekly)
-set_cron_task() {
-    local schedule=$1 cron
-    local script_path=$(readlink -f "$0")
-    
-    rm -f "$cron_task_file" 2>/dev/null
-    [[ "$schedule" == "daily" ]] && cron="0 12 * * *" || cron="0 12 * * 1"
-    echo "$cron root $script_path --check" > "$cron_task_file"
-    chmod 644 "$cron_task_file"
-    systemctl restart cron
-    [[ "$schedule" == "daily" ]] && print_message "success" "已设置每日检测任务" "" "true" || print_message "success" "已设置每周检测任务" "" "true"
-    sleep 1
-}
-
-# 设置自定义 cron 任务
-set_custom_cron_task() {
-    local script_path=$(readlink -f "$0")
-    local cron
-    
-    read -p "请输入 cron 表达式（示例：0 12 * * * 表示每日12:00）： " cron
-    if [[ ! "$cron" =~ ^[0-9*]+[[:space:]][0-9*]+[[:space:]][0-9*]+[[:space:]][0-9*]+[[:space:]][0-9*]+$ ]]; then
-        print_message "error" "无效的 cron 表达式，请输入正确格式" "" "true"
-        sleep 1
-        return
-    fi
-    
-    rm -f "$cron_task_file" 2>/dev/null
-    echo "$cron root $script_path --check" > "$cron_task_file"
-    chmod 644 "$cron_task_file"
-    systemctl restart cron
-    print_message "success" "已设置自定义检测任务（${cron}）" "" "true"
-    sleep 1
-}
-
-# 列出 cron 任务
-list_cron_tasks() {
-    if [ -f "$cron_task_file" ]; then
-        print_message "info" "当前定时任务：\n$(cat "$cron_task_file")" "" "true"
-    else
-        print_message "info" "无定时任务" "" "true"
-    fi
-    sleep 2
-}
-
-# 移除 cron 任务
-remove_cron_task() {
-    rm -f "$cron_task_file" 2>/dev/null
-    systemctl restart cron
-    print_message "success" "已移除定时任务" "" "true"
-    sleep 1
-}
-
-# ======================= 执行检测模块 =======================
-# 执行更新检查并处理结果
-execute_update_check() {
-    verify_system_support
-    run_update_check
-    if [[ $security_update_count -gt 0 || $regular_update_count -gt 0 ]]; then
-        send_email_notification
-        print_message "success" "检测到更新，已发送通知邮件" "" "true"
-    else
-        print_message "info" "系统已是最新状态，无可用更新" "" "true"
-    fi
-    sleep 2
 }
 
 # ======================= 主程序入口模块 =======================
