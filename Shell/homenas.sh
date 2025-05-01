@@ -83,6 +83,7 @@ fi
 declare -A SCRIPT_INFO=(
     ["c11"]="change_sources.sh|配置软件源"
     ["c12"]="install_required_software.sh|安装必备软件"
+    ["c13"]="system_update_checker.sh|系统更新检测"
     ["c21"]="install_cockpit.sh|安装面板Cockpit"
     ["c22"]="install_virtualization.sh|安装虚拟机组件"
     ["c23"]="setup_cockpit_access.sh|外网访问Cockpit"
@@ -119,7 +120,7 @@ declare -a MAIN_MENU_ORDER=(
 
 # 定义子菜单项
 declare -A SUBMENU_ITEMS=(
-    ["系统初始配置"]="c11 c12"
+    ["系统初始配置"]="c11 c12 c13"
     ["系统管理面板"]="c21 c22 c23 c24"
     ["邮件通知服务"]="c31 c32 c33"
     ["系统安全防护"]="c41 c42 c43"
