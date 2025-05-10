@@ -31,7 +31,6 @@ MAX_IP_LIMIT=65536   # 最大 IP 数量限制，与 IPSet maxelem 一致
 BATCH_SIZE=10000     # 每批添加的 IP 数量
 MAX_MANUAL_INPUT=1000  # 手动输入的最大 IP 条数
 CRON_SCRIPT_PATH="/etc/firewalld/.firewalld_ipthreat.sh"
-SYSTEM_CRON_FILE="/etc/cron.d/ipthreat"
 
 # 加载配置文件中的威胁等级和清理计划
 [[ -f "$CONFIG_FILE" ]] && source "$CONFIG_FILE"
@@ -727,7 +726,7 @@ export_ips() {
 }
 
 enable_auto_update() {
-    local temp_cron cron_schedule input_level cron_error
+    local temp_cron cron_schedule input_level
     setup_ipset
     # 设置威胁等级
     output "INFO" "威胁等级说明：数值越大，IP 攻击频率越高，危险性越大，封禁 IP 数量越少，防护范围较窄；数值越小，攻击频率较低，封禁 IP 数量越多，防护范围较广。低数值仍能有效防护潜在威胁。" "" "true"
@@ -766,64 +765,20 @@ enable_auto_update() {
         output "INFO" "使用自定义定时规则: $cron_schedule" "" "true"
     fi
 
-    cp -f "$0" "$CRON_SCRIPT_PATH"
+    cp "$0" "$CRON_SCRIPT_PATH"
     chmod +x "$CRON_SCRIPT_PATH"
 
-    # 检查用户是否有权限编辑 Cron 表
-    if ! crontab -l >/dev/null 2>&1; then
-        output "WARNING" "当前用户无法编辑 Cron 表，尝试使用系统级 Cron" "" "true"
-        if [[ $EUID -ne 0 ]]; then
-            output "ERROR" "系统级 Cron 需要 root 权限，请以 root 用户运行脚本" "" "true"
-            return 1
-        fi
-        # 使用系统级 Cron
-        : > "$SYSTEM_CRON_FILE"
-        echo "$cron_schedule root /bin/bash $CRON_SCRIPT_PATH --auto-update # IPThreat Firewalld Update" >> "$SYSTEM_CRON_FILE"
-        chmod 644 "$SYSTEM_CRON_FILE"
-        output "SUCCESS" "已启用系统级定时更新 IP 封禁（规则: $cron_schedule，威胁等级: $THREAT_LEVEL，配置文件: $SYSTEM_CRON_FILE）" "" "true"
-        return 0
-    fi
-
     temp_cron=$(mktemp)
-    : > "$temp_cron"  # 清空临时文件
-    # 获取现有 Cron 任务，过滤非任务行
-    crontab -l 2>/dev/null | grep -v '^#' | grep -v '^$' | grep -v '=' > "$temp_cron" || true
-    # 移除旧的 IPThreat 更新任务
+    crontab -l > "$temp_cron" 2>/dev/null || true
     sed -i '/# IPThreat Firewalld Update/d' "$temp_cron"
-    # 添加新任务
     echo "$cron_schedule /bin/bash $CRON_SCRIPT_PATH --auto-update # IPThreat Firewalld Update" >> "$temp_cron"
-    # 验证 Cron 文件格式
-    if ! crontab -n "$temp_cron" 2>/dev/null; then
-        output "ERROR" "Cron 文件格式错误，无法应用定时任务" "" "true"
-        rm -f "$temp_cron"
-        return 1
-    fi
-    # 应用 Cron 任务
-    cron_error=$(crontab "$temp_cron" 2>&1)
-    if [[ $? -ne 0 ]]; then
-        output "ERROR" "无法应用 Cron 任务，错误信息: $cron_error" "" "true"
-        output "INFO" "请检查 Cron 服务状态（systemctl status crond）或权限（是否在 /etc/cron.deny 中）" "" "true"
-        if [[ $EUID -eq 0 ]]; then
-            output "INFO" "尝试使用系统级 Cron 作为备用方案" "" "true"
-            : > "$SYSTEM_CRON_FILE"
-            echo "$cron_schedule root /bin/bash $CRON_SCRIPT_PATH --auto-update # IPThreat Firewalld Update" >> "$SYSTEM_CRON_FILE"
-            chmod 644 "$SYSTEM_CRON_FILE"
-            output "SUCCESS" "已启用系统级定时更新 IP 封禁（规则: $cron_schedule，威胁等级: $THREAT_LEVEL，配置文件: $SYSTEM_CRON_FILE）" "" "true"
-        else
-            output "ERROR" "系统级 Cron 需要 root 权限，请以 root 用户运行脚本" "" "true"
-            rm -f "$temp_cron"
-            return 1
-        fi
-    else
-        rm -f "$temp_cron"
-        # 移除系统级 Cron 文件（如果存在）
-        [[ -f "$SYSTEM_CRON_FILE" ]] && rm -f "$SYSTEM_CRON_FILE"
-        output "SUCCESS" "已启用定时更新 IP 封禁（规则: $cron_schedule，威胁等级: $THREAT_LEVEL）" "" "true"
-    fi
+    crontab "$temp_cron"
+    rm -f "$temp_cron"
+    output "SUCCESS" "已启用定时更新 IP 封禁（规则: $cron_schedule，威胁等级: $THREAT_LEVEL）" "" "true"
 }
 
 enable_auto_cleanup() {
-    local temp_cron cleanup_schedule cron_error
+    local temp_cron cleanup_schedule
 
     output "ACTION" "请输入定时清空 IP 封禁的 Cron 规则（例如 '0 0 1 * *' 表示每月第一天 00:00，留空使用默认每月第一天 00:00）：" "" "true"
     read -r cleanup_schedule
@@ -838,63 +793,17 @@ enable_auto_cleanup() {
         output "INFO" "使用自定义清空规则: $cleanup_schedule" "" "true"
     fi
 
-    cp -f "$0" "$CRON_SCRIPT_PATH"
+    cp "$0" "$CRON_SCRIPT_PATH"
     chmod +x "$CRON_SCRIPT_PATH"
 
-    # 检查用户是否有权限编辑 Cron 表
-    if ! crontab -l >/dev/null 2>&1; then
-        output "WARNING" "当前用户无法编辑 Cron 表，尝试使用系统级 Cron" "" "true"
-        if [[ $EUID -ne 0 ]]; then
-            output "ERROR" "系统级 Cron 需要 root 权限，请以 root 用户运行脚本" "" "true"
-            return 1
-        fi
-        # 使用系统级 Cron
-        : > "$SYSTEM_CRON_FILE"
-        echo "$cleanup_schedule root /bin/bash $CRON_SCRIPT_PATH --cleanup # IPThreat Firewalld Cleanup" >> "$SYSTEM_CRON_FILE"
-        chmod 644 "$SYSTEM_CRON_FILE"
-        echo "CLEANUP_SCHEDULE=\"$cleanup_schedule\"" >> "$CONFIG_FILE"
-        output "SUCCESS" "已启用系统级定时清空 IP 封禁（规则: $cleanup_schedule，配置文件: $SYSTEM_CRON_FILE）" "" "true"
-        return 0
-    fi
-
     temp_cron=$(mktemp)
-    : > "$temp_cron"  # 清空临时文件
-    # 获取现有 Cron 任务，过滤非任务行
-    crontab -l 2>/dev/null | grep -v '^#' | grep -v '^$' | grep -v '=' > "$temp_cron" || true
-    # 移除旧的 IPThreat 清空任务
+    crontab -l > "$temp_cron" 2>/dev/null || true
     sed -i '/# IPThreat Firewalld Cleanup/d' "$temp_cron"
-    # 添加新任务
     echo "$cleanup_schedule /bin/bash $CRON_SCRIPT_PATH --cleanup # IPThreat Firewalld Cleanup" >> "$temp_cron"
-    # 验证 Cron 文件格式
-    if ! crontab -n "$temp_cron" 2>/dev/null; then
-        output "ERROR" "Cron 文件格式错误，无法应用定时任务" "" "true"
-        rm -f "$temp_cron"
-        return 1
-    fi
-    # 应用 Cron 任务
-    cron_error=$(crontab "$temp_cron" 2>&1)
-    if [[ $? -ne 0 ]]; then
-        output "ERROR" "无法应用 Cron 任务，错误信息: $cron_error" "" "true"
-        output "INFO" "请检查 Cron 服务状态（systemctl status crond）或权限（是否在 /etc/cron.deny 中）" "" "true"
-        if [[ $EUID -eq 0 ]]; then
-            output "INFO" "尝试使用系统级 Cron 作为备用方案" "" "true"
-            : > "$SYSTEM_CRON_FILE"
-            echo "$cleanup_schedule root /bin/bash $CRON_SCRIPT_PATH --cleanup # IPThreat Firewalld Cleanup" >> "$SYSTEM_CRON_FILE"
-            chmod 644 "$SYSTEM_CRON_FILE"
-            echo "CLEANUP_SCHEDULE=\"$cleanup_schedule\"" >> "$CONFIG_FILE"
-            output "SUCCESS" "已启用系统级定时清空 IP 封禁（规则: $cleanup_schedule，配置文件: $SYSTEM_CRON_FILE）" "" "true"
-        else
-            output "ERROR" "系统级 Cron 需要 root 权限，请以 root 用户运行脚本" "" "true"
-            rm -f "$temp_cron"
-            return 1
-        fi
-    else
-        rm -f "$temp_cron"
-        # 移除系统级 Cron 文件（如果存在）
-        [[ -f "$SYSTEM_CRON_FILE" ]] && rm -f "$SYSTEM_CRON_FILE"
-        echo "CLEANUP_SCHEDULE=\"$cleanup_schedule\"" >> "$CONFIG_FILE"
-        output "SUCCESS" "已启用定时清空 IP 封禁（规则: $cleanup_schedule）" "" "true"
-    fi
+    crontab "$temp_cron"
+    rm -f "$temp_cron"
+    echo "CLEANUP_SCHEDULE=\"$cleanup_schedule\"" >> "$CONFIG_FILE"
+    output "SUCCESS" "已启用定时清空 IP 封禁（规则: $cleanup_schedule）" "" "true"
 }
 
 disable_auto_update() {
@@ -902,20 +811,11 @@ disable_auto_update() {
     temp_cron=$(mktemp)
     crontab -l > "$temp_cron" 2>/dev/null || true
     sed -i '/# IPThreat Firewalld Update/d' "$temp_cron"
-    crontab "$temp_cron" 2>/dev/null || true
+    crontab "$temp_cron"
     rm -f "$temp_cron"
 
-    # 移除系统级 Cron 任务
-    if [[ -f "$SYSTEM_CRON_FILE" ]]; then
-        sed -i '/# IPThreat Firewalld Update/d' "$SYSTEM_CRON_FILE"
-        if [[ ! -s "$SYSTEM_CRON_FILE" ]]; then
-            rm -f "$SYSTEM_CRON_FILE"
-            output "INFO" "已删除系统级 Cron 配置文件: $SYSTEM_CRON_FILE" "" "true"
-        fi
-    fi
-
     # 检查是否还有定时清空任务
-    if ! crontab -l 2>/dev/null | grep -q "# IPThreat Firewalld Cleanup" && ! grep -q "# IPThreat Firewalld Cleanup" "$SYSTEM_CRON_FILE" 2>/dev/null; then
+    if ! crontab -l 2>/dev/null | grep -q "# IPThreat Firewalld Cleanup"; then
         if [[ -f "$CRON_SCRIPT_PATH" ]]; then
             rm -f "$CRON_SCRIPT_PATH"
             output "INFO" "已删除脚本文件: $CRON_SCRIPT_PATH" "" "true"
@@ -929,37 +829,16 @@ disable_auto_update() {
 }
 
 disable_auto_cleanup() {
-    local temp_cron temp_config
+    local temp_cron
     temp_cron=$(mktemp)
     crontab -l > "$temp_cron" 2>/dev/null || true
     sed -i '/# IPThreat Firewalld Cleanup/d' "$temp_cron"
-    crontab "$temp_cron" 2>/dev/null || true
+    crontab "$temp_cron"
     rm -f "$temp_cron"
-
-    # 移除系统级 Cron 任务
-    if [[ -f "$SYSTEM_CRON_FILE" ]]; then
-        sed -i '/# IPThreat Firewalld Cleanup/d' "$SYSTEM_CRON_FILE"
-        if [[ ! -s "$SYSTEM_CRON_FILE" ]]; then
-            rm -f "$SYSTEM_CRON_FILE"
-            output "INFO" "已删除系统级 Cron 配置文件: $SYSTEM_CRON_FILE" "" "true"
-        fi
-    fi
-
-    # 从配置文件中移除 CLEANUP_SCHEDULE
-    if [[ -f "$CONFIG_FILE" ]]; then
-        temp_config=$(mktemp)
-        grep -v "CLEANUP_SCHEDULE" "$CONFIG_FILE" > "$temp_config"
-        mv "$temp_config" "$CONFIG_FILE"
-        output "INFO" "已从配置文件中移除定时清空设置" "" "true"
-        # 如果配置文件为空，删除它
-        if [[ ! -s "$CONFIG_FILE" ]]; then
-            rm -f "$CONFIG_FILE"
-            output "INFO" "配置文件为空，已删除: $CONFIG_FILE" "" "true"
-        fi
-    fi
+    sed -i '/CLEANUP_SCHEDULE/d' "$CONFIG_FILE"
 
     # 检查是否还有定时更新任务
-    if ! crontab -l 2>/dev/null | grep -q "# IPThreat Firewalld Update" && ! grep -q "# IPThreat Firewalld Update" "$SYSTEM_CRON_FILE" 2>/dev/null; then
+    if ! crontab -l 2>/dev/null | grep -q "# IPThreat Firewalld Update"; then
         if [[ -f "$CRON_SCRIPT_PATH" ]]; then
             rm -f "$CRON_SCRIPT_PATH"
             output "INFO" "已删除脚本文件: $CRON_SCRIPT_PATH" "" "true"
@@ -975,26 +854,14 @@ disable_auto_cleanup() {
 view_cron_jobs() {
     local has_jobs=0
     if crontab -l 2>/dev/null | grep -q "# IPThreat Firewalld Update"; then
-        output "INFO" "当前用户级定时更新 IP 封禁任务：" "" "true"
+        output "INFO" "当前定时更新 IP 封禁任务：" "" "true"
         crontab -l 2>/dev/null | grep "# IPThreat Firewalld Update"
         has_jobs=1
     fi
     if crontab -l 2>/dev/null | grep -q "# IPThreat Firewalld Cleanup"; then
-        output "INFO" "当前用户级定时清空 IP 封禁任务：" "" "true"
+        output "INFO" "当前定时清空 IP 封禁任务：" "" "true"
         crontab -l 2>/dev/null | grep "# IPThreat Firewalld Cleanup"
         has_jobs=1
-    fi
-    if [[ -f "$SYSTEM_CRON_FILE" ]]; then
-        if grep -q "# IPThreat Firewalld Update" "$SYSTEM_CRON_FILE"; then
-            output "INFO" "当前系统级定时更新 IP 封禁任务：" "" "true"
-            grep "# IPThreat Firewalld Update" "$SYSTEM_CRON_FILE"
-            has_jobs=1
-        fi
-        if grep -q "# IPThreat Firewalld Cleanup" "$SYSTEM_CRON_FILE"; then
-            output "INFO" "当前系统级定时清空 IP 封禁任务：" "" "true"
-            grep "# IPThreat Firewalld Cleanup" "$SYSTEM_CRON_FILE"
-            has_jobs=1
-        fi
     fi
     if [[ $has_jobs -eq 0 ]]; then
         output "INFO" "无定时任务" "" "true"
