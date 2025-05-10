@@ -144,11 +144,11 @@ expand_ip_range() {
         read -r prefix mask <<< "$result"
         ip_count=$((2 ** (32 - mask)))
         if [[ $ip_count -gt $MAX_IP_LIMIT ]]; then
-            output "WARNING" "IPv4 CIDR $input 包含 $ip_count 个恶意 IP，超出上限 $MAX_IP_LIMIT，跳过" "" "true"
+            output "WARNING" "IPv4 CIDR $input 包含 $ip_count 个 IP，超出上限 $MAX_IP_LIMIT，跳过" "" "true"
             return 1
         fi
         echo "$input" >> "$output_file_ipv4"
-        output "INFO" "解析 IPv4 CIDR $input 为 $ip_count 个恶意 IP 地址" "" "true"
+        output "INFO" "解析 IPv4 CIDR $input 为 $ip_count 个 IP 地址" "" "true"
         return 0
     fi
     result=$(valid_cidr_ipv6 "$input")
@@ -156,11 +156,11 @@ expand_ip_range() {
         read -r prefix mask <<< "$result"
         ip_count=$((2 ** (128 - mask)))
         if [[ $ip_count -gt $MAX_IP_LIMIT ]]; then
-            output "WARNING" "IPv6 CIDR $input 包含 $ip_count 个恶意 IP，超出上限 $MAX_IP_LIMIT，跳过" "" "true"
+            output "WARNING" "IPv6 CIDR $input 包含 $ip_count 个 IP，超出上限 $MAX_IP_LIMIT，跳过" "" "true"
             return 1
         fi
         echo "$input" >> "$output_file_ipv6"
-        output "INFO" "解析 IPv6 CIDR $input 为 $ip_count 个恶意 IP 地址" "" "true"
+        output "INFO" "解析 IPv6 CIDR $input 为 $ip_count 个 IP 地址" "" "true"
         return 0
     fi
 
@@ -186,11 +186,11 @@ expand_ip_range() {
         fi
         ip_count=$((end_num - start_num + 1))
         if [[ $ip_count -gt $MAX_IP_LIMIT ]]; then
-            output "WARNING" "IPv4 范围 $input 包含 $ip_count 个恶意 IP，超出上限 $MAX_IP_LIMIT，跳过" "" "true"
+            output "WARNING" "IPv4 范围 $input 包含 $ip_count 个 IP，超出上限 $MAX_IP_LIMIT，跳过" "" "true"
             return 1
         fi
         if [[ $ip_count -gt $MAX_RANGE_SIZE ]]; then
-            output "WARNING" "IPv4 范围过大（$ip_count 个恶意 IP），请使用 CIDR: $input" "" "true"
+            output "WARNING" "IPv4 范围过大（$ip_count 个 IP），请使用 CIDR: $input" "" "true"
             return 1
         fi
         awk_output=$(awk -v start="$start_num" -v end="$end_num" \
@@ -200,7 +200,7 @@ expand_ip_range() {
             return 1
         fi
         echo "$awk_output" >> "$output_file_ipv4"
-        output "INFO" "解析 IPv4 范围 $input 为 $ip_count 个恶意 IP 地址" "" "true"
+        output "INFO" "解析 IPv4 范围 $input 为 $ip_count 个 IP 地址" "" "true"
         return 0
     elif [[ $input =~ ^([0-9a-fA-F:]+)-([0-9a-fA-F:]+)$ ]]; then
         start_ip=${BASH_REMATCH[1]}
@@ -211,7 +211,7 @@ expand_ip_range() {
         fi
         echo "$start_ip" >> "$output_file_ipv6"
         echo "$end_ip" >> "$output_file_ipv6"
-        output "INFO" "解析 IPv6 范围 $input（简化为边界恶意 IP）" "" "true"
+        output "INFO" "解析 IPv6 范围 $input（简化为边界 IP）" "" "true"
         return 0
     fi
 
@@ -220,15 +220,15 @@ expand_ip_range() {
     if [[ $? -eq 0 ]]; then
         if [[ $protocol == "ipv4" ]]; then
             echo "$input" >> "$output_file_ipv4"
-            output "INFO" "解析单 IPv4 恶意 IP: $input" "" "true"
+            output "INFO" "解析单 IPv4 IP: $input" "" "true"
         else
             echo "$input" >> "$output_file_ipv6"
-            output "INFO" "解析单 IPv6 恶意 IP: $input" "" "true"
+            output "INFO" "解析单 IPv6 IP: $input" "" "true"
         fi
         return 0
     fi
 
-    output "WARNING" "无效恶意 IP 输入: $input" "" "true"
+    output "WARNING" "无效 IP 输入: $input" "" "true"
     return 1
 }
 
@@ -250,14 +250,14 @@ setup_ipset() {
     if firewall-cmd --permanent --get-ipsets | grep -qw "$IPSET_NAME_IPV4"; then
         : # 跳过提示
     else
-        output "INFO" "创建 IPv4 IPSet: $IPSET_NAME_IPV4 用于恶意 IP 封禁" "" "true"
+        output "INFO" "创建 IPv4 IPSet: $IPSET_NAME_IPV4 用于 IP 封禁" "" "true"
         if ! firewall-cmd --permanent --new-ipset="$IPSET_NAME_IPV4" --type=hash:ip --option=family=inet --option=maxelem=$MAX_IP_LIMIT &>/dev/null; then
             output "ERROR" "创建 IPv4 IPSet 失败，请检查 Firewalld 配置或删除现有 IPSet" "" "true"
             exit 1
         fi
     fi
     if ! firewall-cmd --permanent --zone="$ZONE" --list-sources | grep -qw "ipset:$IPSET_NAME_IPV4"; then
-        output "INFO" "将 IPv4 IPSet $IPSET_NAME_IPV4 绑定到区域 $ZONE 以封禁恶意 IP" "" "true"
+        output "INFO" "将 IPv4 IPSet $IPSET_NAME_IPV4 绑定到区域 $ZONE 以封禁 IP" "" "true"
         if ! firewall-cmd --permanent --zone="$ZONE" --add-source="ipset:$IPSET_NAME_IPV4" &>/dev/null; then
             output "ERROR" "绑定 IPv4 IPSet 到区域失败" "" "true"
             exit 1
@@ -267,14 +267,14 @@ setup_ipset() {
     if firewall-cmd --permanent --get-ipsets | grep -qw "$IPSET_NAME_IPV6"; then
         : # 跳过提示
     else
-        output "INFO" "创建 IPv6 IPSet: $IPSET_NAME_IPV6 用于恶意 IP 封禁" "" "true"
+        output "INFO" "创建 IPv6 IPSet: $IPSET_NAME_IPV6 用于 IP 封禁" "" "true"
         if ! firewall-cmd --permanent --new-ipset="$IPSET_NAME_IPV6" --type=hash:ip --option=family=inet6 --option=maxelem=$MAX_IP_LIMIT &>/dev/null; then
             output "ERROR" "创建 IPv6 IPSet 失败，请检查 Firewalld 配置或删除现有 IPSet" "" "true"
             exit 1
         fi
     fi
     if ! firewall-cmd --permanent --zone="$ZONE" --list-sources | grep -qw "ipset:$IPSET_NAME_IPV6"; then
-        output "INFO" "将 IPv6 IPSet $IPSET_NAME_IPV6 绑定到区域 $ZONE 以封禁恶意 IP" "" "true"
+        output "INFO" "将 IPv6 IPSet $IPSET_NAME_IPV6 绑定到区域 $ZONE 以封禁 IP" "" "true"
         if ! firewall-cmd --permanent --zone="$ZONE" --add-source="ipset:$IPSET_NAME_IPV6" &>/dev/null; then
             output "ERROR" "绑定 IPv6 IPSet 到区域失败" "" "true"
             exit 1
@@ -307,18 +307,18 @@ get_ipset_usage() {
 }
 
 download_ipthreat_list() {
-    output "ACTION" "正在下载威胁等级 ${THREAT_LEVEL} 的恶意 IP 列表..." "" "true"
+    output "ACTION" "正在下载威胁等级 ${THREAT_LEVEL} 的 IP 列表..." "" "true"
     if ! wget -q "$IPTHREAT_URL" -O "$TEMP_GZ"; then
-        output "ERROR" "下载威胁等级 ${THREAT_LEVEL} 的恶意 IP 列表失败" "" "true"
+        output "ERROR" "下载威胁等级 ${THREAT_LEVEL} 的 IP 列表失败" "" "true"
         return 1
     fi
     if ! gzip -dc "$TEMP_GZ" > "$TEMP_TXT"; then
-        output "ERROR" "解压威胁等级 ${THREAT_LEVEL} 的恶意 IP 列表失败" "" "true"
+        output "ERROR" "解压威胁等级 ${THREAT_LEVEL} 的 IP 列表失败" "" "true"
         rm -f "$TEMP_GZ"
         return 1
     fi
     rm -f "$TEMP_GZ"
-    output "SUCCESS" "威胁等级 ${THREAT_LEVEL} 的恶意 IP 列表下载并解压成功" "" "true"
+    output "SUCCESS" "威胁等级 ${THREAT_LEVEL} 的 IP 列表下载并解压成功" "" "true"
 }
 
 process_ip_list() {
@@ -326,6 +326,7 @@ process_ip_list() {
     local temp_file_ipv4 temp_file_ipv6 existing_ips_file_ipv4 existing_ips_file_ipv6
     local ipv4_count ipv6_count current_ipv4_count current_ipv6_count
     local ipv4_remaining ipv6_remaining ipv4_to_add ipv6_to_add ipv4_skipped ipv6_skipped
+    local input_ipv4_count input_ipv6_count
 
     temp_file_ipv4=$(mktemp /tmp/expanded_ips_ipv4.XXXXXX.txt)
     temp_file_ipv6=$(mktemp /tmp/expanded_ips_ipv6.XXXXXX.txt)
@@ -334,13 +335,15 @@ process_ip_list() {
     : > "$temp_file_ipv4"
     : > "$temp_file_ipv6"
 
+    # 解析输入文件中的 IP
     awk '!/^#/ && NF {print $1}' "$input_file" | while IFS= read -r ip; do
         [[ -z "$ip" ]] && continue
         expand_ip_range "$ip" "$temp_file_ipv4" "$temp_file_ipv6" || {
-            output "ERROR" "处理恶意 IP $ip 失败" "" "true"
+            output "ERROR" "处理 IP $ip 失败" "" "true"
         }
     done
 
+    # 检查现有 IPSet 中的条目
     if firewall-cmd --permanent --get-ipsets | grep -qw "$IPSET_NAME_IPV4"; then
         firewall-cmd --permanent --ipset="$IPSET_NAME_IPV4" --get-entries | sort > "$existing_ips_file_ipv4" 2>/dev/null
     else
@@ -353,33 +356,39 @@ process_ip_list() {
     fi
     wait
 
+    # 去重输入的 IP
     if ! sort -u "$temp_file_ipv4" > "$output_file_ipv4" 2>/dev/null; then
-        output "ERROR" "IPv4 恶意 IP 去重失败" "" "true"
+        output "ERROR" "IPv4 IP 去重失败" "" "true"
         return 1
     fi
     if ! sort -u "$temp_file_ipv6" > "$output_file_ipv6" 2>/dev/null; then
-        output "ERROR" "IPv6 恶意 IP 去重失败" "" "true"
+        output "ERROR" "IPv6 IP 去重失败" "" "true"
         return 1
     fi
 
+    # 计算输入的 IP 数量
+    input_ipv4_count=$(wc -l < "$output_file_ipv4")
+    input_ipv6_count=$(wc -l < "$output_file_ipv6")
+
+    # 筛选出需要添加或移除的 IP
     local new_output_ipv4=$(mktemp /tmp/new_output_ipv4.XXXXXX.txt)
     local new_output_ipv6=$(mktemp /tmp/new_output_ipv6.XXXXXX.txt)
     if [[ "$mode" == "add" ]]; then
         if ! comm -23 "$output_file_ipv4" "$existing_ips_file_ipv4" > "$new_output_ipv4" 2>/dev/null; then
-            output "ERROR" "IPv4 恶意 IP 比较失败" "" "true"
+            output "ERROR" "IPv4 IP 比较失败" "" "true"
             return 1
         fi
         if ! comm -23 "$output_file_ipv6" "$existing_ips_file_ipv6" > "$new_output_ipv6" 2>/dev/null; then
-            output "ERROR" "IPv6 恶意 IP 比较失败" "" "true"
+            output "ERROR" "IPv6 IP 比较失败" "" "true"
             return 1
         fi
     elif [[ "$mode" == "remove" ]]; then
         if ! comm -12 "$output_file_ipv4" "$existing_ips_file_ipv4" > "$new_output_ipv4" 2>/dev/null; then
-            output "ERROR" "IPv4 恶意 IP 比较失败" "" "true"
+            output "ERROR" "IPv4 IP 比较失败" "" "true"
             return 1
         fi
         if ! comm -12 "$output_file_ipv6" "$existing_ips_file_ipv6" > "$new_output_ipv6" 2>/dev/null; then
-            output "ERROR" "IPv6 恶意 IP 比较失败" "" "true"
+            output "ERROR" "IPv6 IP 比较失败" "" "true"
             return 1
         fi
     fi
@@ -388,6 +397,7 @@ process_ip_list() {
     mv "$new_output_ipv6" "$output_file_ipv6"
     rm -f "$temp_file_ipv4" "$temp_file_ipv6" "$existing_ips_file_ipv4" "$existing_ips_file_ipv6"
 
+    # 计算需要处理的 IP 数量
     ipv4_count=$(wc -l < "$output_file_ipv4")
     ipv6_count=$(wc -l < "$output_file_ipv6")
     if firewall-cmd --permanent --get-ipsets | grep -qw "$IPSET_NAME_IPV4"; then
@@ -401,6 +411,7 @@ process_ip_list() {
         current_ipv6_count=0
     fi
 
+    # 处理添加模式
     if [[ "$mode" == "add" ]]; then
         # 计算剩余容量
         ipv4_remaining=$((MAX_IP_LIMIT - current_ipv4_count))
@@ -423,18 +434,34 @@ process_ip_list() {
         fi
     fi
 
-    output "INFO" "IPv4 恶意 IP 数: $ipv4_count, IPv6 恶意 IP 数: $ipv6_count" "" "true"
-    if [[ "$mode" == "add" && ($ipv4_skipped -gt 0 || $ipv6_skipped -gt 0) ]]; then
-        output "WARNING" "恶意 IP 超出上限 $MAX_IP_LIMIT，IPv4 封禁 $ipv4_to_add 个，跳过 $ipv4_skipped 个；IPv6 封禁 $ipv6_to_add 个，跳过 $ipv6_skipped 个" "" "true"
+    # 输出处理结果
+    output "INFO" "输入 IPv4 IP 数: $input_ipv4_count, IPv6 IP 数: $input_ipv6_count" "" "true"
+    if [[ "$mode" == "add" ]]; then
+        if [[ $input_ipv4_count -eq 0 && $input_ipv6_count -eq 0 ]]; then
+            output "INFO" "未提供任何有效 IP" "" "true"
+        elif [[ $ipv4_to_add -eq 0 && $ipv6_to_add -eq 0 ]]; then
+            if [[ $input_ipv4_count -gt 0 || $input_ipv6_count -gt 0 ]]; then
+                output "INFO" "所有输入 IP 已存在于封禁列表，无需重复添加" "" "true"
+            fi
+        else
+            output "INFO" "将封禁 IPv4 IP: $ipv4_to_add 个, IPv6 IP: $ipv6_to_add 个" "" "true"
+            if [[ $ipv4_skipped -gt 0 || $ipv6_skipped -gt 0 ]]; then
+                output "WARNING" "IP 超出上限 $MAX_IP_LIMIT，IPv4 跳过 $ipv4_skipped 个，IPv6 跳过 $ipv6_skipped 个" "" "true"
+            fi
+        fi
+    elif [[ "$mode" == "remove" ]]; then
+        if [[ $input_ipv4_count -eq 0 && $input_ipv6_count -eq 0 ]]; then
+            output "INFO" "未提供任何有效 IP" "" "true"
+        elif [[ $ipv4_count -eq 0 && $ipv6_count -eq 0 ]]; then
+            output "INFO" "输入的 IP 未在封禁列表中" "" "true"
+        else
+            output "INFO" "将解除 IPv4 IP: $ipv4_count 个, IPv6 IP: $ipv6_count 个" "" "true"
+        fi
     fi
 
-    if [[ $ipv4_to_add -eq 0 && $ipv6_to_add -eq 0 && "$mode" == "add" ]]; then
-        output "INFO" "没有恶意 IP 可封禁（IPSet 已满或输入为空）" "" "true"
-    elif [[ $ipv4_count -eq 0 && $ipv6_count -eq 0 ]]; then
-        output "INFO" "没有恶意 IP 需要处理" "" "true"
-        if [[ "$mode" == "remove" ]]; then
-            output "INFO" "输入的恶意 IP 可能未被封禁" "" "true"
-        fi
+    # 执行 IP 变更
+    if [[ $ipv4_count -eq 0 && $ipv6_count -eq 0 ]]; then
+        output "INFO" "没有 IP 需要处理" "" "true"
     else
         apply_ip_changes "$output_file_ipv4" "$IPSET_NAME_IPV4" "ipv4" "$mode" &
         apply_ip_changes "$output_file_ipv6" "$IPSET_NAME_IPV6" "ipv6" "$mode" &
@@ -448,7 +475,7 @@ apply_ip_changes() {
 
     total_ips=$(wc -l < "$ip_file")
     if [[ $total_ips -eq 0 ]]; then
-        output "INFO" "没有 $protocol 恶意 IP 需要处理" "" "true"
+        output "INFO" "没有 $protocol IP 需要处理" "" "true"
         return
     fi
 
@@ -473,27 +500,27 @@ apply_ip_changes() {
         if [[ "$mode" == "add" && $batch_size -gt $remaining ]]; then
             batch_size=$remaining
             head -n "$batch_size" "$batch" > "${batch}.tmp" && mv "${batch}.tmp" "$batch"
-            output "WARNING" "批次 $batch_index 调整为 $batch_size 个 $protocol 恶意 IP 以避免超限" "" "true"
+            output "WARNING" "批次 $batch_index 调整为 $batch_size 个 $protocol IP 以避免超限" "" "true"
         fi
         if [[ $batch_size -eq 0 ]]; then
-            output "INFO" "批次 $batch_index 无 $protocol 恶意 IP 可封禁（IPSet 已满）" "" "true"
+            output "INFO" "批次 $batch_index 无 $protocol IP 可封禁（IPSet 已满）" "" "true"
             rm -f "$batch"
             continue
         fi
-        output "ACTION" "正在处理 $protocol 恶意 IP 批次 $batch_index/$batch_count，包含 $batch_size 个地址 ($mode)..." "" "true"
+        output "ACTION" "正在处理 $protocol IP 批次 $batch_index/$batch_count，包含 $batch_size 个地址 ($mode)..." "" "true"
         if [[ "$mode" == "add" ]]; then
             if ! output=$(firewall-cmd --permanent --ipset="$ipset_name" --add-entries-from-file="$batch" 2>&1); then
                 if [[ $output =~ "ipset is full" ]]; then
-                    output "ERROR" "IPSet $ipset_name 已满，无法封禁更多 $protocol 恶意 IP" "" "true"
+                    output "ERROR" "IPSet $ipset_name 已满，无法封禁更多 $protocol IP" "" "true"
                 else
-                    output "ERROR" "封禁 $protocol 恶意 IP 到 IPSet $ipset_name 失败: $output" "" "true"
+                    output "ERROR" "封禁 $protocol IP 到 IPSet $ipset_name 失败: $output" "" "true"
                 fi
                 rm -f "$batch_file."*.txt
                 return 1
             fi
         elif [[ "$mode" == "remove" ]]; then
             if ! output=$(firewall-cmd --permanent --ipset="$ipset_name" --remove-entries-from-file="$batch" 2>&1); then
-                output "ERROR" "解除 $protocol 恶意 IP 封禁从 IPSet $ipset_name 失败: $output" "" "true"
+                output "ERROR" "解除 $protocol IP 封禁从 IPSet $ipset_name 失败: $output" "" "true"
                 rm -f "$batch_file."*.txt
                 return 1
             fi
@@ -510,16 +537,16 @@ apply_ip_changes() {
     fi
 
     if [[ "$mode" == "add" ]]; then
-        output "SUCCESS" "成功封禁 $total_ips 个 $protocol 恶意 IP" "" "true"
+        output "SUCCESS" "成功封禁 $total_ips 个 $protocol IP" "" "true"
     else
-        output "SUCCESS" "成功解除 $total_ips 个 $protocol 恶意 IP 封禁" "" "true"
+        output "SUCCESS" "成功解除 $total_ips 个 $protocol IP 封禁" "" "true"
     fi
     rm -f "$batch_file."*.txt
 }
 
 filter_and_add_ips() {
     [[ ! -f "$TEMP_TXT" ]] && {
-        output "ERROR" "恶意 IP 列表文件不存在" "" "true"
+        output "ERROR" "IP 列表文件不存在" "" "true"
         return 1
     }
     setup_ipset
@@ -527,7 +554,7 @@ filter_and_add_ips() {
 }
 
 manual_add_ips() {
-    output "ACTION" "请输入要封禁的恶意 IP（每行一个，支持单 IP、CIDR 或范围，最多 $MAX_MANUAL_INPUT 条）：" "" "true"
+    output "ACTION" "请输入要封禁的 IP（每行一个，支持单 IP、CIDR 或范围，最多 $MAX_MANUAL_INPUT 条）：" "" "true"
     setup_ipset
     : > "$TEMP_IP_LIST_IPV4"
     : > "$TEMP_IP_LIST_IPV6"
@@ -537,7 +564,7 @@ manual_add_ips() {
     while read -r ip && [[ -n "$ip" ]]; do
         ((line_count++))
         if [[ $line_count -gt $MAX_MANUAL_INPUT ]]; then
-            output "ERROR" "输入的恶意 IP 条数超过上限 $MAX_MANUAL_INPUT，请分批输入" "" "true"
+            output "ERROR" "输入的 IP 条数超过上限 $MAX_MANUAL_INPUT，请分批输入" "" "true"
             rm -f "$temp_input"
             return 1
         fi
@@ -545,7 +572,7 @@ manual_add_ips() {
     done
 
     [[ ! -s "$temp_input" ]] && {
-        output "ERROR" "未提供任何恶意 IP" "" "true"
+        output "ERROR" "未提供任何 IP" "" "true"
         rm -f "$temp_input"
         return 1
     }
@@ -556,10 +583,10 @@ manual_add_ips() {
 
 manual_remove_ips() {
     if ! firewall-cmd --permanent --get-ipsets | grep -qw "$IPSET_NAME_IPV4" && ! firewall-cmd --permanent --get-ipsets | grep -qw "$IPSET_NAME_IPV6"; then
-        output "INFO" "无封禁的恶意 IP 或 IPSet 未配置" "" "true"
+        output "INFO" "无封禁的 IP 或 IPSet 未配置" "" "true"
         return
     fi
-    output "ACTION" "请输入要解除封禁的恶意 IP（每行一个，支持单 IP、CIDR 或范围，最多 $MAX_MANUAL_INPUT 条）：" "" "true"
+    output "ACTION" "请输入要解除封禁的 IP（每行一个，支持单 IP、CIDR 或范围，最多 $MAX_MANUAL_INPUT 条）：" "" "true"
     : > "$TEMP_IP_LIST_IPV4"
     : > "$TEMP_IP_LIST_IPV6"
     local temp_input=$(mktemp /tmp/manual_ips.XXXXXX.txt)
@@ -568,7 +595,7 @@ manual_remove_ips() {
     while read -r ip && [[ -n "$ip" ]]; do
         ((line_count++))
         if [[ $line_count -gt $MAX_MANUAL_INPUT ]]; then
-            output "ERROR" "输入的恶意 IP 条数超过上限 $MAX_MANUAL_INPUT，请分批输入" "" "true"
+            output "ERROR" "输入的 IP 条数超过上限 $MAX_MANUAL_INPUT，请分批输入" "" "true"
             rm -f "$temp_input"
             return 1
         fi
@@ -576,7 +603,7 @@ manual_remove_ips() {
     done
 
     [[ ! -s "$temp_input" ]] && {
-        output "ERROR" "未提供任何恶意 IP" "" "true"
+        output "ERROR" "未提供任何 IP" "" "true"
         rm -f "$temp_input"
         return 1
     }
@@ -591,7 +618,7 @@ remove_all_ips() {
 
     # 检查是否存在 IPSet
     if ! firewall-cmd --permanent --get-ipsets | grep -qw "$IPSET_NAME_IPV4" && ! firewall-cmd --permanent --get-ipsets | grep -qw "$IPSET_NAME_IPV6"; then
-        output "INFO" "无封禁的恶意 IP 或 IPSet 未配置" "" "true"
+        output "INFO" "无封禁的 IP 或 IPSet 未配置" "" "true"
         return
     fi
 
@@ -600,7 +627,7 @@ remove_all_ips() {
     sources_ipv6=$(firewall-cmd --permanent --ipset="$IPSET_NAME_IPV6" --get-entries 2>/dev/null)
 
     if [[ -z "$sources_ipv4" && -z "$sources_ipv6" ]]; then
-        output "INFO" "当前无恶意 IP 被封禁" "" "true"
+        output "INFO" "当前无 IP 被封禁" "" "true"
     else
         # 清空 IPv4 和 IPv6 IPSet
         if [[ -n "$sources_ipv4" ]]; then
@@ -660,8 +687,6 @@ remove_all_ips() {
                 return 1
             fi
         fi
-    else
-        output "INFO" "drop 区域包含其他配置，保留配置文件: $drop_xml_file" "" "true"
     fi
 
     # 重新加载 Firewalld 以应用更改
@@ -676,7 +701,7 @@ remove_all_ips() {
 export_ips() {
     local timestamp export_file sources_ipv4 sources_ipv6
     if ! firewall-cmd --permanent --get-ipsets | grep -qw "$IPSET_NAME_IPV4" && ! firewall-cmd --permanent --get-ipsets | grep -qw "$IPSET_NAME_IPV6"; then
-        output "INFO" "无封禁的恶意 IP 或 IPSet 未配置" "" "true"
+        output "INFO" "无封禁的 IP 或 IPSet 未配置" "" "true"
         return
     fi
     timestamp=$(date +%Y%m%d_%H%M%S)
@@ -685,21 +710,21 @@ export_ips() {
     sources_ipv6=$(firewall-cmd --permanent --ipset="$IPSET_NAME_IPV6" --get-entries)
 
     if [[ -z "$sources_ipv4" && -z "$sources_ipv6" ]]; then
-        output "INFO" "当前无恶意 IP 封禁列表可导出" "" "true"
+        output "INFO" "当前无 IP 封禁列表可导出" "" "true"
         return
     fi
 
     : > "$export_file"
-    [[ -n "$sources_ipv4" ]] && echo "# IPv4 Malicious IPs" >> "$export_file" && echo "$sources_ipv4" | tr ' ' '\n' >> "$export_file"
-    [[ -n "$sources_ipv6" ]] && echo "# IPv6 Malicious IPs" >> "$export_file" && echo "$sources_ipv6" | tr ' ' '\n' >> "$export_file"
-    output "SUCCESS" "恶意 IP 封禁列表已导出至: $export_file" "" "true"
+    [[ -n "$sources_ipv4" ]] && echo "# IPv4 IPs" >> "$export_file" && echo "$sources_ipv4" | tr ' ' '\n' >> "$export_file"
+    [[ -n "$sources_ipv6" ]] && echo "# IPv6 IPs" >> "$export_file" && echo "$sources_ipv6" | tr ' ' '\n' >> "$export_file"
+    output "SUCCESS" "IP 封禁列表已导出至: $export_file" "" "true"
 }
 
 enable_auto_update() {
     local user_home cron_script_path temp_cron cron_schedule input_level
     setup_ipset
     # 设置威胁等级
-    output "INFO" "威胁等级说明：数值越大，恶意 IP 攻击频率越高，危险性越大，封禁 IP 数量越少，防护范围较窄；数值越小，攻击频率较低，封禁 IP 数量越多，防护范围较广。低数值仍能有效防护潜在威胁。" "" "true"
+    output "INFO" "威胁等级说明：数值越大，IP 攻击频率越高，危险性越大，封禁 IP 数量越少，防护范围较窄；数值越小，攻击频率较低，封禁 IP 数量越多，防护范围较广。低数值仍能有效防护潜在威胁。" "" "true"
     output "ACTION" "请输入威胁等级（0~100，数值越高，IP 越危险，数量越少，默认为 50）：" "" "true"
     read -r input_level
     if [[ -z "$input_level" ]]; then
@@ -718,7 +743,7 @@ enable_auto_update() {
     TEMP_TXT=$(mktemp /tmp/threat-${THREAT_LEVEL}.XXXXXX.txt)
 
     if ! update_ips; then
-        output "ERROR" "恶意 IP 列表更新失败，取消定时任务" "" "true"
+        output "ERROR" "IP 列表更新失败，取消定时任务" "" "true"
         return 1
     fi
 
@@ -736,7 +761,7 @@ enable_auto_update() {
     fi
 
     user_home=$(eval echo ~$USER)
-    cron_script_path="$user_home/.manage_ipthreat_firewalld.sh"
+    cron_script_path="$user_home/firewalld_ipthreat.sh"
     cp "$0" "$cron_script_path"
     chmod +x "$cron_script_path"
 
@@ -746,13 +771,13 @@ enable_auto_update() {
     echo "$cron_schedule /bin/bash $cron_script_path --auto-update # IPThreat Firewalld Update" >> "$temp_cron"
     crontab "$temp_cron"
     rm -f "$temp_cron"
-    output "SUCCESS" "已启用定时更新恶意 IP 封禁（规则: $cron_schedule，威胁等级: $THREAT_LEVEL）" "" "true"
+    output "SUCCESS" "已启用定时更新 IP 封禁（规则: $cron_schedule，威胁等级: $THREAT_LEVEL）" "" "true"
 }
 
 enable_auto_cleanup() {
     local user_home cron_script_path temp_cron cleanup_schedule
 
-    output "ACTION" "请输入定时清空恶意 IP 封禁的 Cron 规则（例如 '0 0 1 * *' 表示每月第一天 00:00，留空使用默认每月第一天 00:00）：" "" "true"
+    output "ACTION" "请输入定时清空 IP 封禁的 Cron 规则（例如 '0 0 1 * *' 表示每月第一天 00:00，留空使用默认每月第一天 00:00）：" "" "true"
     read -r cleanup_schedule
     if [[ -z "$cleanup_schedule" ]]; then
         cleanup_schedule="0 0 1 * *"
@@ -766,7 +791,7 @@ enable_auto_cleanup() {
     fi
 
     user_home=$(eval echo ~$USER)
-    cron_script_path="$user_home/.manage_ipthreat_firewalld.sh"
+    cron_script_path="$user_home/firewalld_ipthreat.sh"
     cp "$0" "$cron_script_path"
     chmod +x "$cron_script_path"
 
@@ -777,7 +802,7 @@ enable_auto_cleanup() {
     crontab "$temp_cron"
     rm -f "$temp_cron"
     echo "CLEANUP_SCHEDULE=\"$cleanup_schedule\"" >> "$CONFIG_FILE"
-    output "SUCCESS" "已启用定时清空恶意 IP 封禁（规则: $cleanup_schedule）" "" "true"
+    output "SUCCESS" "已启用定时清空 IP 封禁（规则: $cleanup_schedule）" "" "true"
 }
 
 disable_auto_update() {
@@ -787,7 +812,7 @@ disable_auto_update() {
     sed -i '/# IPThreat Firewalld Update/d' "$temp_cron"
     crontab "$temp_cron"
     rm -f "$temp_cron"
-    output "SUCCESS" "已禁用定时更新恶意 IP 封禁" "" "true"
+    output "SUCCESS" "已禁用定时更新 IP 封禁" "" "true"
 }
 
 disable_auto_cleanup() {
@@ -798,18 +823,18 @@ disable_auto_cleanup() {
     crontab "$temp_cron"
     rm -f "$temp_cron"
     sed -i '/CLEANUP_SCHEDULE/d' "$CONFIG_FILE"
-    output "SUCCESS" "已禁用定时清空恶意 IP 封禁" "" "true"
+    output "SUCCESS" "已禁用定时清空 IP 封禁" "" "true"
 }
 
 view_cron_jobs() {
     local has_jobs=0
     if crontab -l 2>/dev/null | grep -q "# IPThreat Firewalld Update"; then
-        output "INFO" "当前定时更新恶意 IP 封禁任务：" "" "true"
+        output "INFO" "当前定时更新 IP 封禁任务：" "" "true"
         crontab -l 2>/dev/null | grep "# IPThreat Firewalld Update"
         has_jobs=1
     fi
     if crontab -l 2>/dev/null | grep -q "# IPThreat Firewalld Cleanup"; then
-        output "INFO" "当前定时清空恶意 IP 封禁任务：" "" "true"
+        output "INFO" "当前定时清空 IP 封禁任务：" "" "true"
         crontab -l 2>/dev/null | grep "# IPThreat Firewalld Cleanup"
         has_jobs=1
     fi
@@ -823,23 +848,23 @@ update_ips() {
 }
 
 show_menu() {
-    echo -e "\n${COLORS[WHITE]}Firewalld 恶意 IP 封禁管理工具${COLORS[RESET]}"
-    echo "封禁工作区域: $ZONE (Firewalld 区域，用于丢弃恶意 IP 流量)"
+    echo -e "${COLORS[WHITE]}Firewalld IP 封禁管理工具${COLORS[RESET]}"
+    echo "封禁工作区域: $ZONE (Firewalld 区域，用于丢弃 IP 流量)"
     echo "当前威胁等级: $THREAT_LEVEL (0~100，数值越高，IP 越危险，数量越少)"
     echo "封禁 IP 使用量: $(get_ipset_usage)"
     echo "---------------------"
     echo "1. 启用定时更新    - 定时下载威胁情报并更新封禁列表"
-    echo "2. 禁用定时更新    - 停止定时更新恶意 IP 封禁"
-    echo "3. 启用定时清空    - 定时清空所有封禁的恶意 IP"
-    echo "4. 禁用定时清空    - 停止定时清空恶意 IP 封禁"
+    echo "2. 禁用定时更新    - 停止定时更新 IP 封禁"
+    echo "3. 启用定时清空    - 定时清空所有封禁的 IP"
+    echo "4. 禁用定时清空    - 停止定时清空 IP 封禁"
     echo "5. 查看定时任务    - 显示更新和清空任务的定时规则"
-    echo "6. 封禁恶意 IP     - 手动输入恶意 IP 或范围进行封禁"
-    echo "7. 解除恶意 IP     - 手动输入恶意 IP 或范围解除封禁"
-    echo "8. 清空封禁列表    - 立即清空所有封禁的恶意 IP"
-    echo "9. 导出封禁列表    - 将当前封禁的恶意 IP 导出到文件"
+    echo "6. 手动封禁 IP     - 手动输入 IP 或范围进行封禁"
+    echo "7. 手动解除 IP     - 手动输入 IP 或范围解除封禁"
+    echo "8. 清空封禁列表    - 立即清空所有封禁的 IP"
+    echo "9. 导出封禁列表    - 将当前封禁的 IP 导出到文件"
     echo "0. 退出            - 退出脚本"
     echo "---------------------"
-    read -p "请选择选项 (0-9): " choice
+    read -p "请选择操作: " choice
     case $choice in
         0) exit 0 ;;
         1) enable_auto_update ;;
