@@ -12,6 +12,7 @@ services:
       - '/opt/docker/nginx-ui/ui:/etc/nginx-ui'
       - '/opt/docker/nginx-ui/logs:/var/log/nginx'
       - '/opt/docker/nginx-ui/www:/var/www'
+      - '/var/run/docker.sock:/var/run/docker.sock'
     ports:
       - '12800:80'
       - '12443:443'
