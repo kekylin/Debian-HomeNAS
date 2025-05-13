@@ -10,7 +10,7 @@ fi
 $SUDO apt update
 
 # 安装必备软件
-$SUDO apt install -y curl git vim wget exim4 gnupg apt-transport-https ca-certificates smartmontools
+$SUDO apt install -y sudo curl git vim wget exim4 gnupg apt-transport-https ca-certificates smartmontools
 
 # 添加第一个创建的用户（ID：1000）至sudo组
 first_user=$(awk -F: '$3>=1000 && $1 != "nobody" {print $1}' /etc/passwd | sort | head -n 1)
