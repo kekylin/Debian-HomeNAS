@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# 脚本功能：管理 Firewalld 的 IP 封禁，基于威胁等级自动更新或手动操作，支持定时任务。
-
 # ==================== 颜色输出模块 ====================
 # 定义输出颜色，用于格式化不同类型的消息
 declare -A COLORS=(
@@ -267,29 +265,6 @@ valid_cidr_ipv4() {
     fi
 }
 
-valid_cidr_ipv6() {
-    # 验证 IPv6 CIDR 格式
-    local input=$1
-    local prefix mask
-    if [[ $input =~ ^([0-9a-fA-F:]+)/([0-9]{1,3})$ ]]; then
-        prefix=${BASH_REMATCH[1]}
-        mask=${BASH_REMATCH[2]}
-        if [[ ! $mask =~ ^[0-9]+$ ]] || [[ $mask -gt 128 ]] || [[ $mask -lt 0 ]]; then
-            output "WARNING" "无效 IPv6 CIDR 掩码：$input"
-            return 1
-        fi
-        if valid_ipv6 "$prefix"; then
-            echo "$prefix $mask"
-            return 0
-        else
-            output "WARNING" "无效 IPv6 CIDR 前缀：$input"
-            return 1
-        fi
-    else
-        return 1
-    fi
-}
-
 expand_ip_range() {
     # 解析 IP 输入（单 IP、CIDR 或范围），并写入临时文件
     local input=$1 output_file_ipv4=$2 output_file_ipv6=$3
@@ -328,25 +303,10 @@ expand_ip_range() {
         return 0
     fi
 
-    # 处理 IPv6 CIDR
-    result=$(valid_cidr_ipv6 "$clean_ip")
-    if [[ $? -eq 0 ]]; then
-        read -r prefix mask <<< "$result"
-        ip_count=$((2 ** (128 - mask)))
-        if ! [[ "$ip_count" =~ ^[0-9]+$ ]]; then
-            output "ERROR" "计算 CIDR IP 数量失败：$clean_ip"
-            return 1
-        fi
-        if [[ $ip_count -gt $MAX_IP_LIMIT ]]; then
-            output "WARNING" "IPv6 CIDR 超出上限：$clean_ip（$ip_count 条）"
-            return 1
-        fi
-        echo "$clean_ip" >> "$output_file_ipv6" || {
-            output "ERROR" "写入 IPv6 CIDR 失败：$clean_ip"
-            return 1
-        }
-        output "INFO" "解析 IPv6 CIDR：$clean_ip"
-        return 0
+    # 忽略 IPv6 CIDR
+    if [[ $clean_ip =~ ^([0-9a-fA-F:]+)/([0-9]{1,3})$ ]]; then
+        output "WARNING" "跳过 IPv6 CIDR 格式：$clean_ip（不支持）"
+        return 1
     fi
 
     # 处理 IPv4 范围
@@ -549,7 +509,7 @@ process_ip_list() {
     local temp_file_ipv4 temp_file_ipv6 existing_ips_file_ipv4 existing_ips_file_ipv6
     local ipv4_count ipv6_count current_ipv4_count current_ipv6_count
     local ipv4_remaining ipv6_remaining ipv4_to_add ipv6_to_add ipv4_skipped ipv6_skipped
-    local input_ipv4_count input_ipv6_count
+    local input_ipv4_count input_ipv6_count total_input_count invalid_count
 
     temp_file_ipv4=$(mktemp /tmp/expanded_ips_ipv4.XXXXXX.txt)
     temp_file_ipv6=$(mktemp /tmp/expanded_ips_ipv6.XXXXXX.txt)
@@ -561,13 +521,21 @@ process_ip_list() {
     # 预处理输入文件，移除空行和注释
     local temp_input=$(mktemp /tmp/processed_input.XXXXXX.txt)
     grep -v '^\s*$' "$input_file" | grep -v '^\s*#' > "$temp_input" || {
-        output "WARNING" "输入文件为空或仅含注释"
+        output "INFO" "输入文件为空或仅含注释，无需处理"
         rm -f "$temp_input" "$temp_file_ipv4" "$temp_file_ipv6" "$existing_ips_file_ipv4" "$existing_ips_file_ipv6"
-        return 1
+        return 0  # 空输入直接返回成功
     }
 
+    # 计算总输入行数（非空、非注释行）
+    total_input_count=$(wc -l < "$temp_input")
+    if ! [[ "$total_input_count" =~ ^[0-9]+$ ]]; then
+        output "ERROR" "计算输入行数失败：$total_input_count"
+        rm -f "$temp_input" "$temp_file_ipv4" "$temp_file_ipv6" "$existing_ips_file_ipv4" "$existing_ips_file_ipv6"
+        return 1
+    fi
+
     # 解析 IP 输入
-    local invalid_count=0
+    invalid_count=0
     while IFS= read -r ip; do
         [[ -z "$ip" ]] && continue
         if ! expand_ip_range "$ip" "$temp_file_ipv4" "$temp_file_ipv6"; then
@@ -575,15 +543,23 @@ process_ip_list() {
         fi
     done < "$temp_input"
 
-    rm -f "$temp_input"
+    # 如果所有输入都被跳过（全部为无效 IP，例如 IPv6 CIDR）
+    if [[ $invalid_count -eq $total_input_count ]]; then
+        output "INFO" "所有输入的 IP ($invalid_count 条) 均为不支持的格式（例如 IPv6 CIDR），已跳过"
+        rm -f "$temp_input" "$temp_file_ipv4" "$temp_file_ipv6" "$existing_ips_file_ipv4" "$existing_ips_file_ipv6"
+        return 0  # 直接返回成功
+    fi
 
+    # 输出无效 IP 数量（如果有）
     if [[ $invalid_count -gt 0 ]]; then
         output "WARNING" "跳过 $invalid_count 条无效 IP"
     fi
 
+    rm -f "$temp_input"
+
     # 验证临时文件内容
     if [[ ! -s "$temp_file_ipv4" && ! -s "$temp_file_ipv6" ]]; then
-        output "ERROR" "无有效 IP（检查输入格式）"
+        output "ERROR" "无有效 IP（请检查输入格式，确保包含支持的 IPv4/IPv6 单 IP、IPv4 CIDR 或范围）"
         rm -f "$temp_file_ipv4" "$temp_file_ipv6" "$existing_ips_file_ipv4" "$existing_ips_file_ipv6"
         return 1
     fi
@@ -618,6 +594,7 @@ process_ip_list() {
     input_ipv6_count=$(wc -l < "$output_file_ipv6")
     if ! [[ "$input_ipv4_count" =~ ^[0-9]+$ && "$input_ipv6_count" =~ ^[0-9]+$ ]]; then
         output "ERROR" "计算输入 IP 数量失败：IPv4=$input_ipv4_count, IPv6=$input_ipv6_count"
+        rm -f "$temp_file_ipv4" "$temp_file_ipv6" "$existing_ips_file_ipv4" "$existing_ips_file_ipv6"
         return 1
     fi
     output "DEBUG" "输入 IP 数量：IPv4=$input_ipv4_count, IPv6=$input_ipv6_count"
