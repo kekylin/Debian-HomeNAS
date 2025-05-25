@@ -54,23 +54,15 @@ if ! [[ "$MAX_IP_LIMIT" =~ ^[0-9]+$ ]]; then
     exit 1
 fi
 
-# 确保配置目录存在
-if [[ ! -d "$CONFIG_DIR" ]]; then
-    output "INFO" "创建目录：$CONFIG_DIR"
-    if ! mkdir -p "$CONFIG_DIR"; then
-        output "ERROR" "创建目录失败：$CONFIG_DIR（检查权限）"
-        exit 1
+# 加载配置文件，仅加载指定变量（仅在需要时加载）
+load_config() {
+    if [[ -f "$CONFIG_FILE" ]]; then
+        source <(grep -E '^(THREAT_LEVEL|UPDATE_CRON|CLEANUP_CRON)=' "$CONFIG_FILE") || {
+            output "ERROR" "加载配置文件失败：$CONFIG_FILE（检查格式）"
+            exit 1
+        }
     fi
-    chmod 755 "$CONFIG_DIR"
-fi
-
-# 加载配置文件，仅加载指定变量
-if [[ -f "$CONFIG_FILE" ]]; then
-    source <(grep -E '^(THREAT_LEVEL|UPDATE_CRON|CLEANUP_CRON)=' "$CONFIG_FILE") || {
-        output "ERROR" "加载配置文件失败：$CONFIG_FILE（检查格式）"
-        exit 1
-    }
-fi
+}
 
 # ==================== 临时文件管理 ====================
 # 创建临时文件用于存储下载数据和处理结果
@@ -275,8 +267,8 @@ expand_ip_range() {
         return 1
     }
 
-    # 移除注释和多余空格
-    local clean_ip=$(echo "$input" | cut -d'#' -f1 | tr -d '[:space:]')
+    # 移除注释（# 及其后内容）和多余空格
+    local clean_ip=$(echo "$input" | sed 's/#.*$//' | tr -d '[:space:]')
     [[ -z "$clean_ip" ]] && {
         output "WARNING" "无效输入（提取后为空）：$input"
         return 1
@@ -597,7 +589,6 @@ process_ip_list() {
         rm -f "$temp_file_ipv4" "$temp_file_ipv6" "$existing_ips_file_ipv4" "$existing_ips_file_ipv6"
         return 1
     fi
-    output "DEBUG" "输入 IP 数量：IPv4=$input_ipv4_count, IPv6=$input_ipv6_count"
 
     # 筛选需要添加或移除的 IP
     local new_output_ipv4=$(mktemp /tmp/new_output_ipv4.XXXXXX.txt)
@@ -638,14 +629,13 @@ process_ip_list() {
     }
     rm -f "$temp_file_ipv4" "$temp_file_ipv6" "$existing_ips_file_ipv4" "$existing_ips_file_ipv6"
 
-    # 调试：检查筛选后的 IP 数量
+    # 计算筛选后的 IP 数量
     ipv4_count=$(wc -l < "$output_file_ipv4")
     ipv6_count=$(wc -l < "$output_file_ipv6")
     if ! [[ "$ipv4_count" =~ ^[0-9]+$ && "$ipv6_count" =~ ^[0-9]+$ ]]; then
         output "ERROR" "计算处理 IP 数量失败：IPv4=$ipv4_count, IPv6=$ipv6_count"
         return 1
     fi
-    output "DEBUG" "筛选后 IP 数量：IPv4=$ipv4_count, IPv6=$ipv6_count"
 
     # 获取当前 IPSet 计数
     if firewall-cmd --permanent --get-ipsets | grep -qw "$IPSET_NAME_IPV4"; then
@@ -754,12 +744,19 @@ apply_ip_changes() {
         rm -f "$batch_file"
         return 1
     fi
-    remaining=$((MAX_IP_LIMIT - current_count))
-    if ! [[ "$remaining" =~ ^[0-9]+$ ]]; then
-        output "ERROR" "计算剩余 IP 数量失败：$remaining"
-        rm -f "$batch_file"
-        return 1
+
+    # 仅在添加模式下计算剩余容量
+    if [[ "$mode" == "add" ]]; then
+        remaining=$((MAX_IP_LIMIT - current_count))
+        if ! [[ "$remaining" =~ ^[0-9]+$ ]]; then
+            output "ERROR" "计算剩余 IP 数量失败：$remaining"
+            rm -f "$batch_file"
+            return 1
+        fi
+    else
+        remaining=$current_count  # 移除模式下，remaining 不影响操作，仅用于调试
     fi
+
     split -l "$BATCH_SIZE" "$ip_file" "$batch_file." --additional-suffix=.txt
     batch_count=$(ls "$batch_file."*.txt | wc -l 2>/dev/null || 0)
     if ! [[ "$batch_count" =~ ^[0-9]+$ ]]; then
@@ -807,6 +804,12 @@ apply_ip_changes() {
                 rm -f "$batch_file."*.txt
                 return 1
             fi
+            remaining=$((remaining - batch_size))
+            if ! [[ "$remaining" =~ ^[0-9]+$ ]]; then
+                output "ERROR" "更新剩余 IP 数量失败：$remaining"
+                rm -f "$batch_file."*.txt
+                return 1
+            fi
         elif [[ "$mode" == "remove" ]]; then
             cmd_output=$(firewall-cmd --permanent --ipset="$ipset_name" --remove-entries-from-file="$batch" 2>&1)
             if [[ $? -ne 0 ]]; then
@@ -814,12 +817,7 @@ apply_ip_changes() {
                 rm -f "$batch_file."*.txt
                 return 1
             fi
-        fi
-        remaining=$((remaining - batch_size))
-        if ! [[ "$remaining" =~ ^[0-9]+$ ]]; then
-            output "ERROR" "更新剩余 IP 数量失败：$remaining"
-            rm -f "$batch_file."*.txt
-            return 1
+            # 移除模式下不更新 remaining，避免负值
         fi
         ((batch_index++))
         rm -f "$batch"
@@ -847,8 +845,8 @@ filter_and_add_ips() {
 
 manual_add_ips() {
     # 手动添加 IP 到封禁列表
-    output "ACTION" "输入封禁 IP（每行一个，单 IP/CIDR/范围，最多 $MAX_MANUAL_INPUT 条，空行结束，Ctrl+C 取消）："
     setup_ipset
+    output "ACTION" "输入封禁 IP（每行一个，单 IP/CIDR/范围，最多 $MAX_MANUAL_INPUT 条，空行结束，Ctrl+C 取消）："
     : > "$TEMP_IP_LIST_IPV4"
     : > "$TEMP_IP_LIST_IPV6"
     local temp_input=$(mktemp /tmp/manual_ips.XXXXXX.txt)
@@ -990,9 +988,22 @@ remove_all_ips() {
     output "SUCCESS" "已清空所有封禁 IP"
 }
 
+create_config_dir() {
+    # 创建配置目录，仅在需要时调用
+    if [[ ! -d "$CONFIG_DIR" ]]; then
+        output "INFO" "创建目录：$CONFIG_DIR"
+        if ! mkdir -p "$CONFIG_DIR"; then
+            output "ERROR" "创建目录失败：$CONFIG_DIR（检查权限）"
+            exit 1
+        fi
+        chmod 755 "$CONFIG_DIR"
+    fi
+}
+
 enable_auto_update() {
     # 启用定时更新 IP 封禁列表
     local temp_cron cron_schedule input_level
+    create_config_dir
     output "INFO" "威胁等级：0~100，数值越高，IP 危险性越高，数量越少"
     output "ACTION" "输入威胁等级（0~100，默认 50）："
     read -r input_level
@@ -1008,7 +1019,7 @@ enable_auto_update() {
     fi
     if ! echo "THREAT_LEVEL=$THREAT_LEVEL" > "$CONFIG_FILE"; then
         output "ERROR" "写入配置文件失败：$CONFIG_FILE（检查权限）"
-        return 1
+        return Ah
     fi
     chmod 644 "$CONFIG_FILE" 2>/dev/null || {
         output "ERROR" "设置配置文件权限失败：$CONFIG_FILE"
@@ -1056,24 +1067,17 @@ enable_auto_update() {
         break
     done
 
-    IPTHREAT_URL="https://lists.ipthreat.net/file/ipthreat-lists/threat/threat-${THREAT_LEVEL}.txt.gz"
-    TEMP_GZ=$(mktemp /tmp/threat-${THREAT_LEVEL}.XXXXXX.gz)
-    TEMP_TXT=$(mktemp /tmp/threat-${THREAT_LEVEL}.XXXXXX.txt)
-
-    setup_ipset
-    if ! update_ips; then
-        output "ERROR" "更新 IP 列表失败"
-        return 1
+    # 仅在首次启用时复制脚本
+    if [[ ! -f "$CRON_SCRIPT_PATH" ]]; then
+        if ! cp "$0" "$CRON_SCRIPT_PATH"; then
+            output "ERROR" "复制脚本失败：$CRON_SCRIPT_PATH（检查权限）"
+            return 1
+        fi
+        chmod +x "$CRON_SCRIPT_PATH" 2>/dev/null || {
+            output "ERROR" "设置脚本权限失败：$CRON_SCRIPT_PATH"
+            return 1
+        }
     fi
-
-    if ! cp "$0" "$CRON_SCRIPT_PATH"; then
-        output "ERROR" "复制脚本失败：$CRON_SCRIPT_PATH（检查权限）"
-        return 1
-    fi
-    chmod +x "$CRON_SCRIPT_PATH" 2>/dev/null || {
-        output "ERROR" "设置脚本权限失败：$CRON_SCRIPT_PATH"
-        return 1
-    }
 
     temp_cron=$(mktemp)
     crontab -l > "$temp_cron" 2>/dev/null || true
@@ -1090,11 +1094,22 @@ enable_auto_update() {
         return 1
     fi
     output "SUCCESS" "启用定时更新（规则: $cron_schedule, 威胁等级: $THREAT_LEVEL）"
+
+    # 立即执行一次更新以验证配置
+    IPTHREAT_URL="https://lists.ipthreat.net/file/ipthreat-lists/threat/threat-${THREAT_LEVEL}.txt.gz"
+    TEMP_GZ=$(mktemp /tmp/threat-${THREAT_LEVEL}.XXXXXX.gz)
+    TEMP_TXT=$(mktemp /tmp/threat-${THREAT_LEVEL}.XXXXXX.txt)
+    setup_ipset
+    if ! update_ips; then
+        output "ERROR" "更新 IP 列表失败"
+        return 1
+    fi
 }
 
 enable_auto_cleanup() {
     # 启用定时清空封禁列表
     local temp_cron cleanup_schedule
+    create_config_dir
     output "DEBUG" "开始启用定时清空，CONFIG_FILE=$CONFIG_FILE, MAX_IP_LIMIT=$MAX_IP_LIMIT"
     while true; do
         output "ACTION" "输入清空 IP Cron 规则（默认每月第一天 01:00，分钟间隔需 >= 60）："
@@ -1136,14 +1151,17 @@ enable_auto_cleanup() {
         break
     done
 
-    if ! cp "$0" "$CRON_SCRIPT_PATH"; then
-        output "ERROR" "复制脚本失败：$CRON_SCRIPT_PATH（检查权限）"
-        return 1
+    # 仅在首次启用时复制脚本
+    if [[ ! -f "$CRON_SCRIPT_PATH" ]]; then
+        if ! cp "$0" "$CRON_SCRIPT_PATH"; then
+            output "ERROR" "复制脚本失败：$CRON_SCRIPT_PATH（检查权限）"
+            return 1
+        fi
+        chmod +x "$CRON_SCRIPT_PATH" 2>/dev/null || {
+            output "ERROR" "设置脚本权限失败：$CRON_SCRIPT_PATH"
+            return 1
+        }
     fi
-    chmod +x "$CRON_SCRIPT_PATH" 2>/dev/null || {
-        output "ERROR" "设置脚本权限失败：$CRON_SCRIPT_PATH"
-        return 1
-    }
 
     temp_cron=$(mktemp)
     crontab -l > "$temp_cron" 2>/dev/null || true
@@ -1269,11 +1287,9 @@ update_ips() {
 show_menu() {
     # 显示交互式菜单
     local display_threat_level="未设置"
-    if [[ -f "$CONFIG_FILE" ]]; then
-        source <(grep -E '^(THREAT_LEVEL|UPDATE_CRON|CLEANUP_CRON)=' "$CONFIG_FILE")
-        if [[ "$THREAT_LEVEL" =~ ^[0-9]+$ && "$THREAT_LEVEL" -ge 0 && "$THREAT_LEVEL" -le 100 ]]; then
-            display_threat_level="$THREAT_LEVEL"
-        fi
+    load_config
+    if [[ "$THREAT_LEVEL" =~ ^[0-9]+$ && "$THREAT_LEVEL" -ge 0 && "$THREAT_LEVEL" -le 100 ]]; then
+        display_threat_level="$THREAT_LEVEL"
     fi
     echo -e "${COLORS[WHITE]}Firewalld IP 封禁管理${COLORS[RESET]}"
     echo "区域: $ZONE"
@@ -1301,7 +1317,8 @@ show_menu() {
         6) manual_add_ips ;;
         7) manual_remove_ips ;;
         8) remove_all_ips ;;
-        *) output "ERROR" "无效选项：$choice" ;;
+        *) outpu
+t "ERROR" "无效选项：$choice" ;;
     esac
 }
 
@@ -1317,40 +1334,39 @@ main() {
         shift
     done
 
-    check_dependencies
-    select_zone
-
+    # 定时任务模式：直接读取配置并执行核心功能
     if [[ $auto_update -eq 1 ]]; then
-        if [[ -f "$CONFIG_FILE" ]]; then
-            source <(grep -E '^(THREAT_LEVEL|UPDATE_CRON|CLEANUP_CRON)=' "$CONFIG_FILE")
-            output "INFO" "加载威胁等级：$THREAT_LEVEL"
-        else
-            output "INFO" "无配置文件，使用默认威胁等级：$DEFAULT_THREAT_LEVEL"
-            THREAT_LEVEL=$DEFAULT_THREAT_LEVEL
+        load_config
+        if [[ ! -f "$CONFIG_FILE" ]]; then
+            output "ERROR" "配置文件不存在：$CONFIG_FILE"
+            exit 1
         fi
-
         if ! [[ "$THREAT_LEVEL" =~ ^[0-9]+$ ]] || [[ "$THREAT_LEVEL" -lt 0 ]] || [[ "$THREAT_LEVEL" -gt 100 ]]; then
             output "ERROR" "无效威胁等级：$THREAT_LEVEL，使用默认：$DEFAULT_THREAT_LEVEL"
             THREAT_LEVEL=$DEFAULT_THREAT_LEVEL
         fi
-
         IPTHREAT_URL="https://lists.ipthreat.net/file/ipthreat-lists/threat/threat-${THREAT_LEVEL}.txt.gz"
         TEMP_GZ=$(mktemp /tmp/threat-${THREAT_LEVEL}.XXXXXX.gz)
         TEMP_TXT=$(mktemp /tmp/threat-${THREAT_LEVEL}.XXXXXX.txt)
-
         output "INFO" "开始定时更新，威胁等级：$THREAT_LEVEL"
-        setup_ipset
         update_ips
         output "SUCCESS" "定时更新完成"
+        exit 0
     elif [[ $cleanup -eq 1 ]]; then
         output "INFO" "开始清空封禁 IP"
         remove_all_ips
         output "SUCCESS" "清空封禁 IP 完成"
-    else
-        while true; do
-            show_menu
-        done
+        exit 0
     fi
+
+    # 交互模式：执行依赖检查和区域验证
+    check_dependencies
+    select_zone
+
+    # 交互模式：显示菜单
+    while true; do
+        show_menu
+    done
 }
 
 main "$@"
