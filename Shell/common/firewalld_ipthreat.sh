@@ -344,8 +344,15 @@ reload_firewalld() {
 }
 
 download_threat_list() {
-    if ! wget -q "$(get_threat_list_url "$THREAT_LEVEL")" -O "$TEMP_GZ"; then
-        log_message "ERROR" "下载威胁 IP 列表失败"
+    # 确保 THREAT_LEVEL 已定义
+    local threat_level="${THREAT_LEVEL:-$DEFAULT_THREAT_LEVEL}"
+    if ! [[ "$threat_level" =~ ^[0-9]+$ ]] || [[ "$threat_level" -lt 0 || "$threat_level" -gt 100 ]]; then
+        log_message "WARNING" "无效威胁等级：$threat_level，使用默认值 $DEFAULT_THREAT_LEVEL"
+        threat_level=$DEFAULT_THREAT_LEVEL
+    fi
+    log_message "INFO" "正在下载威胁等级 $threat_level 的 IP 列表"
+    if ! wget -q "$(get_threat_list_url "$threat_level")" -O "$TEMP_GZ"; then
+        log_message "ERROR" "下载威胁 IP 列表失败（威胁等级：$threat_level）"
         return 1
     fi
     if ! gzip -dc "$TEMP_GZ" > "$TEMP_TXT"; then
@@ -355,7 +362,7 @@ download_threat_list() {
     fi
     rm -f "$TEMP_GZ"
     TEMP_FILES=("${TEMP_FILES[@]/$TEMP_GZ}")
-    log_message "SUCCESS" "威胁 IP 列表下载完成"
+    log_message "SUCCESS" "威胁 IP 列表下载完成（威胁等级：$threat_level）"
 }
 
 process_ip_list() {
@@ -373,7 +380,7 @@ process_ip_list() {
     : > "$temp_file_ipv6"
 
     local temp_input=$(mktemp /tmp/processed_input.XXXXXX.txt); TEMP_FILES+=("$temp_input")
-    grep -v '^\s*$' "$input_file" | grep -v '^\s*#' > "$temp_input" || {
+    grep -v '^\s*$pkg: parse error near `\n' "$input_file" | grep -v '^\s*#' > "$temp_input" || {
         log_message "INFO" "IP 列表为空或仅包含注释，无需处理"
         cleanup_temp_files
         return 0
@@ -701,6 +708,9 @@ enable_auto_update() {
         log_message "WARNING" "无效威胁等级：$threat_level，使用默认值 $DEFAULT_THREAT_LEVEL"
         threat_level=$DEFAULT_THREAT_LEVEL
     fi
+    # 设置全局 THREAT_LEVEL 并导出
+    THREAT_LEVEL=$threat_level
+    export THREAT_LEVEL
 
     # 提示用户输入 Cron 规则
     echo -e "请输入 Cron 规则（留空使用默认值 $DEFAULT_UPDATE_CRON）："
@@ -823,6 +833,16 @@ check_ipset_needs_reset() {
 }
 
 update_threat_ips() {
+    # 确保 THREAT_LEVEL 在当前作用域中可用
+    local threat_level="${THREAT_LEVEL:-$DEFAULT_THREAT_LEVEL}"
+    if ! [[ "$threat_level" =~ ^[0-9]+$ ]] || [[ "$threat_level" -lt 0 || "$threat_level" -gt 100 ]]; then
+        log_message "WARNING" "无效威胁等级：$threat_level，使用默认值 $DEFAULT_THREAT_LEVEL"
+        THREAT_LEVEL=$DEFAULT_THREAT_LEVEL
+    else
+        THREAT_LEVEL=$threat_level
+    fi
+    export THREAT_LEVEL
+
     if check_ipset_needs_reset; then
         remove_all_ips
     else
@@ -857,7 +877,7 @@ init_manual() {
     if [[ ! -f "$LOG_FILE" ]]; then
         log_message "INFO" "创建日志文件：$LOG_FILE"
         if ! touch "$LOG_FILE"; then
-            log_message "ERROR" "创建日志文件失败：$LOG_FILE"
+            log_message "ERROR" "创日志文件失败：$LOG_FILE"
             exit 1
         fi
         chmod 644 "$LOG_FILE"
@@ -903,10 +923,13 @@ init_cron() {
         cleanup_temp_files
         exit 1
     }
+    # 验证威胁等级
     if ! [[ "$THREAT_LEVEL" =~ ^[0-9]+$ ]] || [[ "$THREAT_LEVEL" -lt 0 || "$THREAT_LEVEL" -gt 100 ]]; then
         THREAT_LEVEL=$DEFAULT_THREAT_LEVEL
         log_message "WARNING" "配置文件中的威胁等级无效，使用默认值：$THREAT_LEVEL"
     fi
+    # 确保 THREAT_LEVEL 是全局变量
+    export THREAT_LEVEL
 }
 
 # ==================== 菜单函数 =================
