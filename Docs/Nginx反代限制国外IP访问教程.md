@@ -3,17 +3,18 @@
 ## 一、安装Nginx、GeoIP2
 1、执行Nginx、GeoIP2安装命令：
 ```bash
-apt install -y nginx libmaxminddb0 libmaxminddb-dev mmdb-bin libnginx-mod-http-geoip2
+apt install -y nginx-full mmdb-bin
 ```
 2、验证是否已成功安装，执行命令：
 ```bash
 nginx -v
-nginx -V 2>&1 | grep -o with-http_geoip_module
+nginx -V 2>&1 | ls /usr/lib/nginx/modules/ | grep geoip2
 ```
 3、返回成功结果：
 ```bash
 nginx version: nginx/1.22.1
-with-http_geoip_module
+ngx_http_geoip2_module.so
+ngx_stream_geoip2_module.so
 ```
 ![image](https://github.com/user-attachments/assets/c9664504-ecf6-4d3b-8cc3-3f23614ba86b)
 
