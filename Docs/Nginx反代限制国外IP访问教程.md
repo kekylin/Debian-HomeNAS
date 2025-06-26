@@ -16,7 +16,6 @@ nginx version: nginx/1.22.1
 ngx_http_geoip2_module.so
 ngx_stream_geoip2_module.so
 ```
-![image](https://github.com/user-attachments/assets/c9664504-ecf6-4d3b-8cc3-3f23614ba86b)
 
 ## 二、下载IP地址定位数据库
 1、GeoLite2是一个免费的IP地址定位数据库,用户可以免费地使用其中的数据。下载IP地址定位数据库文件需要登陆官网进行下载，没有账号的朋友需要先行注册账号。
